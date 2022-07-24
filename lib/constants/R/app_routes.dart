@@ -3,4 +3,7 @@ class AppRoutesTO {
   final String loginScreen = '/login-screen';
   final String registerScreen = '/register-screen';
   final String mainScreen = '/main-screen';
+  final String homeScreen = '/home-screen';
+  final String chatScreen = '/chat-screen';
+  final String profileScreen = '/profile-screen';
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
-import 'package:latihan_soal_app/view/login_screen.dart';
-import 'package:latihan_soal_app/view/main_screen.dart';
-import 'package:latihan_soal_app/view/register_screen.dart';
-import 'package:latihan_soal_app/view/splash_screen.dart';
+import 'package:latihan_soal_app/views/login_screen.dart';
+import 'package:latihan_soal_app/views/main/discussion/chat_screen.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
+import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
+import 'package:latihan_soal_app/views/main_screen.dart';
+import 'package:latihan_soal_app/views/register_screen.dart';
+import 'package:latihan_soal_app/views/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,6 +24,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: R.appCOLORS.greyColor,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: R.appCOLORS.primaryColor,
+        ),
       ),
       initialRoute: R.appRoutesTO.splashScreen,
       routes: {
@@ -28,6 +34,9 @@ class MyApp extends StatelessWidget {
         R.appRoutesTO.loginScreen: (context) => const LoginScreen(),
         R.appRoutesTO.registerScreen: (context) => const RegisterScreen(),
         R.appRoutesTO.mainScreen: (context) => const MainScreen(),
+        R.appRoutesTO.homeScreen: (context) => const HomeScreen(),
+        R.appRoutesTO.chatScreen: (context) => const ChatScreen(),
+        R.appRoutesTO.profileScreen: (context) => const ProfileScreen(),
       },
     );
   }

@@ -82,10 +82,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             borderColor: R.appCOLORS.primaryColor,
             child: Text(
               R.appSTRINGS.daftarText,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             onTap: () {
-              Navigator.pushNamed(context, R.appRoutesTO.mainScreen);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                R.appRoutesTO.mainScreen,
+                (route) => false,
+              );
             },
           ),
         ),
@@ -161,6 +165,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
+                    icon: Icon(Icons.keyboard_arrow_down,
+                        color: R.appCOLORS.blackLabelTextColor),
                     hint: Text(
                       'pilih kelas',
                       style: TextStyle(
