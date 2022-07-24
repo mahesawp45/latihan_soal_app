@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
-import 'package:latihan_soal_app/view/login_scree.dart';
+import 'package:latihan_soal_app/view/login_screen.dart';
+import 'package:latihan_soal_app/view/main_screen.dart';
+import 'package:latihan_soal_app/view/register_screen.dart';
 import 'package:latihan_soal_app/view/splash_screen.dart';
 
 void main() {
@@ -18,11 +20,14 @@ class MyApp extends StatelessWidget {
       title: 'Latihan Soal',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: R.appCOLORS.greyColor,
       ),
       initialRoute: R.appRoutesTO.splashScreen,
       routes: {
         R.appRoutesTO.splashScreen: (context) => const SplashScreen(),
         R.appRoutesTO.loginScreen: (context) => const LoginScreen(),
+        R.appRoutesTO.registerScreen: (context) => const RegisterScreen(),
+        R.appRoutesTO.mainScreen: (context) => const MainScreen(),
       },
     );
   }

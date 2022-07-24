@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/widgets/login_button.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -54,7 +55,9 @@ class LoginScreen extends StatelessWidget {
                   fontSize: 17,
                 ),
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, R.appRoutesTO.registerScreen);
+              },
             ),
             LoginButton(
               backgroundColor: R.appCOLORS.buttonTextColor,
@@ -68,52 +71,6 @@ class LoginScreen extends StatelessWidget {
               ),
               onTap: () {},
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class LoginButton extends StatelessWidget {
-  final Color backgroundColor;
-  final Color borderColor;
-  final String iconButton;
-  final Widget child;
-  final VoidCallback onTap;
-
-  const LoginButton({
-    Key? key,
-    required this.backgroundColor,
-    required this.borderColor,
-    required this.iconButton,
-    required this.child,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          primary: backgroundColor,
-          fixedSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-            side: BorderSide(
-              color: borderColor,
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(iconButton),
-            const SizedBox(width: 15),
-            child,
           ],
         ),
       ),
