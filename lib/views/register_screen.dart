@@ -40,37 +40,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: Container(),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 50),
+        child: Container(
+          decoration: BoxDecoration(boxShadow: [
+            BoxShadow(
+              blurRadius: 20,
+              spreadRadius: 5,
+              color: Colors.black.withOpacity(0.05),
+              offset: const Offset(0, 10),
             ),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                color: Colors.black.withOpacity(0.1),
-                spreadRadius: 5,
-                offset: const Offset(0, 0),
-              )
-            ],
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Yuk isi data diri',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
+          ]),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(15),
+                bottomRight: Radius.circular(15),
+              ),
+            ),
+            iconTheme: const IconThemeData(color: Colors.black),
+            title: const Text(
+              'Yuk isi data diri',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+              ),
+            ),
           ),
         ),
       ),

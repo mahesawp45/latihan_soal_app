@@ -49,19 +49,17 @@ class _MainScreenState extends State<MainScreen> {
   Container _buildBottomNavigation(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-            color: Colors.black.withOpacity(0.06),
-          ),
-        ],
-      ),
-      child: ClipRRect(
+        color: Colors.white.withOpacity(0),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+            // topLeft: Radius.circular(20),
+            // topRight: Radius.circular(20),
+            ),
         child: BottomAppBar(
           color: Colors.white,
           child: SizedBox(
@@ -120,6 +118,7 @@ class BottomNavigationMainMenuButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 10),
         child: Material(
+          color: Colors.transparent,
           child: InkWell(
             onTap: child == null ? null : onTap,
             child: Column(

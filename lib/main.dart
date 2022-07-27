@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/views/login_screen.dart';
 import 'package:latihan_soal_app/views/main/discussion/chat_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/mapel_screen.dart';
 import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
 import 'package:latihan_soal_app/views/main_screen.dart';
 import 'package:latihan_soal_app/views/register_screen.dart';
@@ -22,11 +24,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Latihan Soal',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        appBarTheme: AppBarTheme(backgroundColor: R.appCOLORS.primaryColor),
+        textTheme: GoogleFonts.poppinsTextTheme(),
         scaffoldBackgroundColor: R.appCOLORS.greyColor,
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: R.appCOLORS.primaryColor,
         ),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+            .copyWith(secondary: R.appCOLORS.primaryColor),
       ),
       initialRoute: R.appRoutesTO.splashScreen,
       routes: {
@@ -37,6 +42,7 @@ class MyApp extends StatelessWidget {
         R.appRoutesTO.homeScreen: (context) => const HomeScreen(),
         R.appRoutesTO.chatScreen: (context) => const ChatScreen(),
         R.appRoutesTO.profileScreen: (context) => const ProfileScreen(),
+        R.appRoutesTO.mapelScreen: (context) => const MapelScreen(),
       },
     );
   }

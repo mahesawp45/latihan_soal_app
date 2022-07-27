@@ -44,20 +44,30 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            LoginButton(
-              backgroundColor: Colors.white,
-              borderColor: R.appCOLORS.primaryColor,
-              iconButton: R.appASSETS.loginWithGoogleICON,
-              child: Text(
-                R.appSTRINGS.loginWithGoogleText,
-                style: TextStyle(
-                  color: R.appCOLORS.buttonTextColor,
-                  fontSize: 17,
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                  blurRadius: 60,
+                  spreadRadius: 5,
+                  color: Colors.black.withOpacity(0.15),
+                  offset: const Offset(0, 40),
                 ),
+              ]),
+              child: LoginButton(
+                backgroundColor: Colors.white,
+                borderColor: R.appCOLORS.primaryColor,
+                iconButton: R.appASSETS.loginWithGoogleICON,
+                child: Text(
+                  R.appSTRINGS.loginWithGoogleText,
+                  style: TextStyle(
+                    color: R.appCOLORS.buttonTextColor,
+                    fontSize: 16,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, R.appRoutesTO.registerScreen);
+                },
               ),
-              onTap: () {
-                Navigator.pushNamed(context, R.appRoutesTO.registerScreen);
-              },
             ),
             LoginButton(
               backgroundColor: R.appCOLORS.buttonTextColor,
@@ -66,7 +76,7 @@ class LoginScreen extends StatelessWidget {
               child: Text(
                 R.appSTRINGS.loginWithAppleIDText,
                 style: const TextStyle(
-                  fontSize: 17,
+                  fontSize: 16,
                 ),
               ),
               onTap: () {},
