@@ -14,13 +14,15 @@ class LoginScreen extends StatelessWidget {
         padding: const EdgeInsets.all(32),
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                R.appSTRINGS.loginText,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  R.appSTRINGS.loginText,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),

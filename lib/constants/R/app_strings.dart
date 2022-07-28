@@ -15,4 +15,10 @@ class AppSTRINGS {
 
   // Mapel
   final String pilihPaketSoalText = 'Pilih Paket Soal';
+
+  // Profile
+  final String akunSayaText = 'Akun Saya';
+  final String editText = 'Edit';
+  final String keluarText = 'Keluar';
+  final String identitasDiriText = 'Identitas Diri';
 }

@@ -14,4 +14,7 @@ class AppASSETS {
 
   // Mapel
   final String noteICON = "assets/ic_note.png";
+
+  // profile
+  final String logoutICON = "assets/ic_logout.png";
 }
