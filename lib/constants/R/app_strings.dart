@@ -6,8 +6,13 @@ class AppSTRINGS {
   final String loginWithGoogleText = 'Masuk dengan Google';
   final String loginWithAppleIDText = 'Masuk dengan Apple ID';
   final String daftarText = 'DAFTAR';
+
+  // Home
   final String homeTopBannerText = 'Mau kerjain soal apa hari ini?';
   final String pilihPelajaranText = 'Pilih Pelajaran';
   final String lihatSemuaText = 'Lihat Semua';
   final String terbaruText = 'Terbaru';
+
+  // Mapel
+  final String pilihPaketSoalText = 'Pilih Paket Soal';
 }

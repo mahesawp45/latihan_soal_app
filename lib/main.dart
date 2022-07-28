@@ -5,6 +5,7 @@ import 'package:latihan_soal_app/views/login_screen.dart';
 import 'package:latihan_soal_app/views/main/discussion/chat_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/mapel_screen.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
 import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
 import 'package:latihan_soal_app/views/main_screen.dart';
 import 'package:latihan_soal_app/views/register_screen.dart';
@@ -35,14 +36,20 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: R.appRoutesTO.splashScreen,
       routes: {
+        // Splash, Login, Register
         R.appRoutesTO.splashScreen: (context) => const SplashScreen(),
         R.appRoutesTO.loginScreen: (context) => const LoginScreen(),
         R.appRoutesTO.registerScreen: (context) => const RegisterScreen(),
+
+        // Home
         R.appRoutesTO.mainScreen: (context) => const MainScreen(),
         R.appRoutesTO.homeScreen: (context) => const HomeScreen(),
         R.appRoutesTO.chatScreen: (context) => const ChatScreen(),
         R.appRoutesTO.profileScreen: (context) => const ProfileScreen(),
+
+        // Latihan soal
         R.appRoutesTO.mapelScreen: (context) => const MapelScreen(),
+        R.appRoutesTO.paketSoalScreen: (context) => const PaketSoalScreen(),
       },
     );
   }

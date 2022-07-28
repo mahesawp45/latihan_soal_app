@@ -17,7 +17,9 @@ class MapelScreen extends StatelessWidget {
           itemCount: 15,
           itemBuilder: (context, index) {
             return GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, R.appRoutesTO.paketSoalScreen);
+              },
               child: const MapelWidget(),
             );
           },

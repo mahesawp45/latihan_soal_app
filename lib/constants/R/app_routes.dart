@@ -8,5 +8,8 @@ class AppRoutesTO {
   final String homeScreen = '/home-screen';
   final String chatScreen = '/chat-screen';
   final String profileScreen = '/profile-screen';
+
+  //Latihan Soal Screen
   final String mapelScreen = '/mapel-screen';
+  final String paketSoalScreen = '/paket-latihan-screen';
 }

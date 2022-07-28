@@ -11,4 +11,7 @@ class AppASSETS {
   final String homeTopBannerICON = "assets/img_home.png";
   final String atomICON = "assets/ic_atom.png";
   final String homeBannerICON = "assets/img_banner.png";
+
+  // Mapel
+  final String noteICON = "assets/ic_note.png";
 }
