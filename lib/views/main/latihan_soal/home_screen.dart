@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildHomeUserProfile(),
               _buildHomeTopBanner(context),
               _buildHomeListMapel(),
-              Container(
+              SizedBox(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
