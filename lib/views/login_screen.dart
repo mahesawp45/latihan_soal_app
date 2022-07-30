@@ -1,91 +1,149 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/widgets/login_button.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  // Google Sign IN
+  Future<UserCredential> signInWithGoogle() async {
+    // Cek Platform apakah WEB atau Native
+    if (kIsWeb) {
+      // Create a new provider
+      GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
+      googleProvider
+          .addScope('https://www.googleapis.com/auth/contacts.readonly');
+      googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+    } else {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: R.appCOLORS.greyColor,
-      body: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          children: [
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  R.appSTRINGS.loginText,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
+      body: LayoutBuilder(builder: (context, constraints) {
+        return Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            children: [
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    R.appSTRINGS.loginText,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Image.asset(R.appASSETS.loginICON),
-            const SizedBox(height: 35),
-            Text(
-              R.appSTRINGS.welcomeText,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
+              const SizedBox(height: 20),
+              Image.asset(
+                R.appASSETS.loginICON,
+                height: constraints.maxWidth >= 920 ? 250 : 180,
               ),
-            ),
-            Text(
-              R.appSTRINGS.loginDescriptionText,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: R.appCOLORS.greySubtitleColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const Spacer(),
-            Container(
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                  blurRadius: 60,
-                  spreadRadius: 5,
-                  color: Colors.black.withOpacity(0.15),
-                  offset: const Offset(0, 40),
+              const SizedBox(height: 35),
+              Text(
+                R.appSTRINGS.welcomeText,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
                 ),
-              ]),
-              child: LoginButton(
-                backgroundColor: Colors.white,
-                borderColor: R.appCOLORS.primaryColor,
-                iconButton: R.appASSETS.loginWithGoogleICON,
+              ),
+              Text(
+                R.appSTRINGS.loginDescriptionText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: R.appCOLORS.greySubtitleColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                decoration: BoxDecoration(boxShadow: [
+                  BoxShadow(
+                    blurRadius: 60,
+                    spreadRadius: 5,
+                    color: Colors.black.withOpacity(0.15),
+                    offset: const Offset(0, 40),
+                  ),
+                ]),
+                child: LoginButton(
+                  backgroundColor: Colors.white,
+                  borderColor: R.appCOLORS.primaryColor,
+                  iconButton: R.appASSETS.loginWithGoogleICON,
+                  child: Text(
+                    R.appSTRINGS.loginWithGoogleText,
+                    style: TextStyle(
+                      color: R.appCOLORS.buttonTextColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onTap: () async {
+                    // INI kalo user login berhasil, ga perlu simpen ke sharedpreference data credential user karena sudah otomatis terisi
+                    await signInWithGoogle();
+                    final user = FirebaseAuth.instance.currentUser;
+
+                    if (user != null) {
+                      Navigator.pushNamed(
+                          context, R.appRoutesTO.registerScreen);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Gagal Masuk'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+              LoginButton(
+                backgroundColor: R.appCOLORS.buttonTextColor,
+                borderColor: Colors.white,
+                iconButton: R.appASSETS.loginWithAppleIDICON,
                 child: Text(
-                  R.appSTRINGS.loginWithGoogleText,
-                  style: TextStyle(
-                    color: R.appCOLORS.buttonTextColor,
+                  R.appSTRINGS.loginWithAppleIDText,
+                  style: const TextStyle(
                     fontSize: 16,
                   ),
                 ),
-                onTap: () {
-                  Navigator.pushNamed(context, R.appRoutesTO.registerScreen);
-                },
+                onTap: () {},
               ),
-            ),
-            LoginButton(
-              backgroundColor: R.appCOLORS.buttonTextColor,
-              borderColor: Colors.white,
-              iconButton: R.appASSETS.loginWithAppleIDICON,
-              child: Text(
-                R.appSTRINGS.loginWithAppleIDText,
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 
@@ -11,10 +12,21 @@ class SplashScreen extends StatelessWidget {
     Timer(
       const Duration(seconds: 5),
       () {
-        Navigator.pushReplacementNamed(
-          context,
-          R.appRoutesTO.loginScreen,
-        );
+        final user = FirebaseAuth.instance.currentUser;
+
+        // Ini semisal kalo user udah login, nanti otomatis credentialnya tersimpan tanpa shared preferences
+        if (user != null) {
+          // TODO redirect to register or home page
+          Navigator.pushReplacementNamed(
+            context,
+            R.appRoutesTO.mainScreen,
+          );
+        } else {
+          Navigator.pushReplacementNamed(
+            context,
+            R.appRoutesTO.loginScreen,
+          );
+        }
       },
     );
 

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_app/constants/r.dart';
@@ -11,7 +12,17 @@ import 'package:latihan_soal_app/views/main_screen.dart';
 import 'package:latihan_soal_app/views/register_screen.dart';
 import 'package:latihan_soal_app/views/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyBFcBLN2EUBgDWDswes0pybjKRDpjxW-CE",
+      appId: "1:405198497194:web:d2bb78d9e43eda04c9f7d3",
+      messagingSenderId: "405198497194",
+      projectId: "latihan-soal-c1dc9",
+      authDomain: "latihan-soal-c1dc9.firebaseapp.com",
+    ),
+  );
   runApp(const MyApp());
 }
 

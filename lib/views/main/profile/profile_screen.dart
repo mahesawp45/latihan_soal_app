@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -132,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            _buildLogoutButton(),
+            _buildLogoutButton(context),
             const SizedBox(height: 50),
           ],
         ),
@@ -140,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Container _buildLogoutButton() {
+  Container _buildLogoutButton(BuildContext context) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 13, vertical: 18),
@@ -158,7 +161,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        onTap: () {},
+        onTap: () async {
+          // INI otomatis terlogout tanpa harus hapus apa" di local kaya sharedpreferences
+          if (kIsWeb) {
+            // await GoogleSignIn(
+            //   clientId:
+            //       "405198497194-dbu3ae5capuc8v6dd1446g4dekde0ud9.apps.googleusercontent.com",
+            //   scopes: [
+            //     'email',
+            //     'https://www.googleapis.com/auth/contacts.readonly',
+            //   ],
+            // ).signOut();
+          } else {
+            // ini Native
+            await GoogleSignIn().signOut();
+          }
+
+          await FirebaseAuth.instance.signOut();
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            R.appRoutesTO.loginScreen,
+            (route) => false,
+          );
+        },
         title: Row(
           children: [
             Image.asset(
