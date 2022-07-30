@@ -15,6 +15,12 @@
             "name": "latihan_soal_app",
             "request": "launch",
             "type": "dart",
+            "flutterMode": "debug",
+        },
+        {
+            "name": "latihan_soal_app (profile mode)",
+            "request": "launch",
+            "type": "dart",
             "flutterMode": "profile",
             
         },

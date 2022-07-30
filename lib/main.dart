@@ -15,6 +15,7 @@ import 'package:latihan_soal_app/views/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: 'Latihan Soal',
     options: const FirebaseOptions(
       apiKey: "AIzaSyBFcBLN2EUBgDWDswes0pybjKRDpjxW-CE",
       appId: "1:405198497194:web:d2bb78d9e43eda04c9f7d3",
