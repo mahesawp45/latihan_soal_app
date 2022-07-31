@@ -1,5 +1,6 @@
 class ApiUrl {
   static String baseURL = 'https://ekskul.id/api/';
+  static String apiKEY = '18be70c0-4e4d-44ff-a475-50c51ece99a0';
 
   // endpoint
   // user

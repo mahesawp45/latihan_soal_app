@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/constants/repository/auth_api.dart';
+import 'package:latihan_soal_app/models/user_by_email.dart';
 import 'package:latihan_soal_app/widgets/login_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -69,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               Image.asset(
                 R.appASSETS.loginICON,
-                height: constraints.maxWidth >= 920 ? 250 : 180,
+                height: constraints.maxWidth >= 920 ? 300 : 250,
               ),
               const SizedBox(height: 35),
               Text(
@@ -115,8 +117,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     final user = FirebaseAuth.instance.currentUser;
 
                     if (user != null) {
-                      Navigator.pushNamed(
-                          context, R.appRoutesTO.registerScreen);
+                      final dataUser =
+                          await AuthAPI().getUserByEmail(email: user.email);
+
+                      if (dataUser != null) {
+                        // Masukkan data ke model yang dibuat dengan JSON to DART melalui email yg udah diGET
+                        final data = UserByEmail.fromJson(dataUser);
+
+                        // Cek apakah user sudah pernah login atau belum
+                        if (data.status == 1) {
+                          // data.status == 1 itu didapat dari response API
+                          Navigator.pushNamed(
+                              context, R.appRoutesTO.mainScreen);
+                        } else {
+                          Navigator.pushNamed(
+                              context, R.appRoutesTO.registerScreen);
+                        }
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
