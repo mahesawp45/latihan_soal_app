@@ -9,7 +9,7 @@ class ApiUrl {
 
   // Latihan Soal
   static String latihanMapel = "exercise/data_course";
-  static String latihanPaketSoal = "exercise/data_course";
+  static String latihanPaketSoal = "exercise/data_exercise";
   static String latihanKerjakanSoal = "/exercise/kerjakan";
   static String latihanSubmitJawaban = "/exercise/input_jawaban";
   static String latihanSkor = "/exercise/score_result";
