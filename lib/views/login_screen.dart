@@ -2,10 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
 import 'package:latihan_soal_app/constants/r.dart';
-import 'package:latihan_soal_app/constants/repository/auth_api.dart';
+import 'package:latihan_soal_app/helpers/user_helpers.dart';
+import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
+import 'package:latihan_soal_app/repository/auth_api.dart';
 import 'package:latihan_soal_app/widgets/login_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -114,15 +115,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () async {
                     // INI kalo user login berhasil, ga perlu simpen ke sharedpreference data credential user karena sudah otomatis terisi
                     await signInWithGoogle();
-                    final user = FirebaseAuth.instance.currentUser;
+                    final user = UserHelpers.getUserEmail();
 
                     if (user != null) {
-                      final dataUser =
-                          await AuthAPI().getUserByEmail(email: user.email);
+                      final dataUser = await AuthAPI().getUserByEmail();
 
-                      if (dataUser != null) {
+                      if (dataUser.status == Status.success) {
                         // Masukkan data ke model yang dibuat dengan JSON to DART melalui email yg udah diGET
-                        final data = UserByEmail.fromJson(dataUser);
+                        final data = UserByEmail.fromJson(dataUser.data!);
 
                         // Cek apakah user sudah pernah login atau belum
                         if (data.status == 1) {

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:latihan_soal_app/constants/api_url.dart';
+import 'package:latihan_soal_app/helpers/user_helpers.dart';
+import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 
 class AuthAPI {
   Dio dioAPI() {
@@ -20,41 +22,40 @@ class AuthAPI {
   }
 
   // ini fungsi http request secara global
-  Future<Map<String, dynamic>?> _getRequest({endPoint, params}) async {
+  Future<NetworkResponses> _getRequest({endPoint, params}) async {
     try {
       final dio = dioAPI();
       final result = await dio.get(endPoint, queryParameters: params);
-      return result.data;
+      return NetworkResponses.success(result.data);
     } on DioError catch (e) {
       if (e.type == DioErrorType.sendTimeout) {
-        print('Error Timeout');
+        return NetworkResponses.error(data: null, message: 'Request Timeout');
       }
-      print('Error Dio');
+      return NetworkResponses.error(data: null, message: 'Error Dio');
     } catch (e) {
-      print('Error Lainnya');
+      return NetworkResponses.error(data: null, message: 'Other Error');
     }
-    return null;
   }
 
-  Future<Map<String, dynamic>?> _postRequest({endPoint, body}) async {
+  Future<NetworkResponses> _postRequest({endPoint, body}) async {
     try {
       final dio = dioAPI();
       final result = await dio.post(endPoint, data: body);
-      return result.data;
+      return NetworkResponses.success(result.data);
     } on DioError catch (e) {
       if (e.type == DioErrorType.sendTimeout) {
-        print('Error Timeout');
+        return NetworkResponses.error(data: null, message: 'Request Timeout');
       }
-      print('Error Dio');
+      return NetworkResponses.error(data: null, message: 'Error Dio');
     } catch (e) {
-      print('Error Lainnya');
+      return NetworkResponses.error(data: null, message: 'Other Error');
     }
-    return null;
   }
 
-  Future<Map<String, dynamic>?> getUserByEmail({email}) async {
+  // Buat get User Email
+  Future<NetworkResponses> getUserByEmail() async {
     final result = _getRequest(endPoint: ApiUrl.users, params: {
-      'email': email,
+      'email': UserHelpers.getUserEmail(),
     });
     return result;
   }

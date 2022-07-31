@@ -2,11 +2,12 @@
 
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
-import 'package:latihan_soal_app/constants/repository/auth_api.dart';
+import 'package:latihan_soal_app/helpers/user_helpers.dart';
+import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
+import 'package:latihan_soal_app/repository/auth_api.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -16,15 +17,14 @@ class SplashScreen extends StatelessWidget {
     Timer(
       const Duration(seconds: 3),
       () async {
-        final user = FirebaseAuth.instance.currentUser;
+        final user = UserHelpers.getUserEmail();
 
-        // Ini semisal kalo user udah login, nanti otomatis credentialnya tersimpan tanpa shared preferences
         if (user != null) {
-          final dataUser = await AuthAPI().getUserByEmail(email: user.email);
+          final dataUser = await AuthAPI().getUserByEmail();
 
-          if (dataUser != null) {
+          if (dataUser.status == Status.success) {
             // Masukkan data ke model yang dibuat dengan JSON to DART melalui email yg udah diGET
-            final data = UserByEmail.fromJson(dataUser);
+            final data = UserByEmail.fromJson(dataUser.data!);
 
             // Cek apakah user sudah pernah login atau belum
             if (data.status == 1) {
