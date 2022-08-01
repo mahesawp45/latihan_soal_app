@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Login Button buatan sendiri
 class LoginButton extends StatelessWidget {
   final Color backgroundColor;
   final Color borderColor;

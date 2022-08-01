@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 
+/// Progress Bar buatan sendiri,
+///
+/// menjadi indikator dalam proses User belajar di aplikasi ini
 class ProgressBarWidget extends StatelessWidget {
   const ProgressBarWidget({
     Key? key,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// SEMUA WARNA Statis dalam aplikasi
 class AppCOLORS {
   final Color primaryColor = const Color(0xff3A7FD5);
   final Color greyColor = const Color(0xffF3F7F8);

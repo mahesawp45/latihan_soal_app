@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 
+/// Tombol untuk mengisi data Gender
 class GenderFieldSelect extends StatelessWidget {
   final String gender;
   final Function()? onPressed;

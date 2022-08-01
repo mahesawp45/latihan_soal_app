@@ -1,3 +1,4 @@
+/// SEMUA STRING Statis dalam aplikasi
 class AppSTRINGS {
   final String loginText = 'Login';
   final String welcomeText = 'Selamat Datang';
@@ -7,7 +8,7 @@ class AppSTRINGS {
   final String loginWithAppleIDText = 'Masuk dengan Apple ID';
   final String daftarText = 'DAFTAR';
 
-  //Registrasi
+  // Registrasi
   final String pesanErrorRegisText =
       'Terjadi kesalahan, silahkan ulangi kembali';
 

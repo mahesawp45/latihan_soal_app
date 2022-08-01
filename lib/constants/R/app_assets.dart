@@ -1,3 +1,4 @@
+/// SEMUA ASSETS Statis dalam aplikasi
 class AppASSETS {
   final String splashICON = "assets/auth/ic_splash.png";
   final String loginICON = "assets/auth/img_login.png";

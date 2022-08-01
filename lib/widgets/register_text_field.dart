@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
 
+/// TextField untuk Register buatan sendiri
 class RegisterTextField extends StatelessWidget {
   final String? hintText;
   final String? labelText;

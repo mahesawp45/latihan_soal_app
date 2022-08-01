@@ -5,6 +5,7 @@ import 'package:latihan_soal_app/constants/api_url.dart';
 import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 
+///Penanganan Request API dengan dio
 class AuthAPI {
   Dio _dioAPI() {
     BaseOptions options = BaseOptions(
@@ -21,7 +22,9 @@ class AuthAPI {
     return dio;
   }
 
-  // ini fungsi http request secara global
+  /// Method http get request secara global
+  ///
+  /// Bisa digunakan untuk get data lainnya dalam aplikasi ini
   Future<NetworkResponses> _getRequest({endPoint, params}) async {
     try {
       final dio = _dioAPI();
@@ -37,6 +40,9 @@ class AuthAPI {
     }
   }
 
+  /// Method http post request secara global
+  ///
+  /// Bisa digunakan untuk post data lainnya dalam aplikasi ini
   Future<NetworkResponses> _postRequest({endPoint, body}) async {
     try {
       final dio = _dioAPI();
@@ -52,7 +58,7 @@ class AuthAPI {
     }
   }
 
-  // Buat get User Email
+  /// Method get User Email
   Future<NetworkResponses> getUserByEmail() async {
     final result = await _getRequest(endPoint: ApiUserUrl.users, params: {
       'email': UserHelpers.getUserEmail(),
@@ -60,7 +66,7 @@ class AuthAPI {
     return result;
   }
 
-  // Buat post user yang akan register
+  /// Method post user yang akan register
   Future<NetworkResponses> postRegister(json) async {
     final result = await _postRequest(
       endPoint: ApiUserUrl.userRegistration,

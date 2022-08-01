@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/helpers/preference_helpers.dart';
 import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
@@ -108,6 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 'foto': UserHelpers.getUserPhotoURL(),
               };
 
+              // Post data user ke API
               final result = await AuthAPI().postRegister(jsonDataUser);
 
               if (result.status == Status.success) {
@@ -115,6 +117,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 final registerResult = UserByEmail.fromJson(result.data ?? {});
 
                 if (registerResult.status == 1) {
+                  // Simpan ke local data user yang telah register
+                  await PreferenceHelpers().setUserData(registerResult.data!);
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     R.appRoutesTO.mainScreen,

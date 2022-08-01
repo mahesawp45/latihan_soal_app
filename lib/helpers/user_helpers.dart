@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// Pemanggilan atau mengambil data User yang sudah login
 class UserHelpers {
   static String? getUserEmail() {
     final user = FirebaseAuth.instance.currentUser;

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/widgets/progress_bar.dart';
 
+/// Sebuah widget card buatan sendiri,
+///
+/// untuk menampilkan nama Mapel. jumlah paket soal dan Progress
 class MapelWidget extends StatelessWidget {
   const MapelWidget({
     Key? key,

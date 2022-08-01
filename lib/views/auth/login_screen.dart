@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/helpers/preference_helpers.dart';
 import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
@@ -125,8 +126,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         final data = UserByEmail.fromJson(dataUser.data!);
 
                         // Cek apakah user sudah pernah login atau belum
+                        // data.status == 1 itu didapat dari response API
                         if (data.status == 1) {
-                          // data.status == 1 itu didapat dari response API
+                          /* simpan data user ke local dengan SharedPref yang sudah disetting di PreferenceHelpers
+                           apabila user sudah pernah register atau status 1, maka simpan datanya ke local,
+                           Kalau belum pernah register, nanti datanya disimpan ke local barengan waktu register ke API
+                          */
+                          await PreferenceHelpers().setUserData(data.data!);
                           Navigator.pushNamed(
                               context, R.appRoutesTO.mainScreen);
                         } else {
