@@ -2,14 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_app/constants/r.dart';
-import 'package:latihan_soal_app/views/login_screen.dart';
+import 'package:latihan_soal_app/views/auth/login_screen.dart';
 import 'package:latihan_soal_app/views/main/discussion/chat_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/mapel_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
 import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
 import 'package:latihan_soal_app/views/main_screen.dart';
-import 'package:latihan_soal_app/views/register_screen.dart';
+import 'package:latihan_soal_app/views/auth/register_screen.dart';
 import 'package:latihan_soal_app/views/splash_screen.dart';
 
 void main() async {

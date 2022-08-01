@@ -55,9 +55,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         (currentChat?['sent'] as Timestamp?)?.toDate();
 
                     return Container(
-                      margin: user.uid == currentChat?['uid']
-                          ? const EdgeInsets.only(bottom: 15, right: 15)
-                          : const EdgeInsets.only(bottom: 15, left: 15),
+                      margin: const EdgeInsets.only(
+                          bottom: 15, right: 15, left: 15),
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: Column(
                         crossAxisAlignment: user.uid == currentChat?['uid']
@@ -73,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
+                                horizontal: 15, vertical: 10),
                             decoration: BoxDecoration(
                               color: user.uid == currentChat?['uid']
                                   ? R.appCOLORS.primaryColor

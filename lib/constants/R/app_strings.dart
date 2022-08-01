@@ -7,6 +7,10 @@ class AppSTRINGS {
   final String loginWithAppleIDText = 'Masuk dengan Apple ID';
   final String daftarText = 'DAFTAR';
 
+  //Registrasi
+  final String pesanErrorRegisText =
+      'Terjadi kesalahan, silahkan ulangi kembali';
+
   // Home
   final String homeTopBannerText = 'Mau kerjain soal apa hari ini?';
   final String pilihPelajaranText = 'Pilih Pelajaran';

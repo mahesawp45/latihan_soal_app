@@ -8,6 +8,7 @@ class RegisterTextField extends StatelessWidget {
   final TextEditingController? controller;
   final TextInputType? textInputType;
   final TextInputAction? textInputAction;
+  final bool? enabled;
 
   const RegisterTextField({
     Key? key,
@@ -16,6 +17,7 @@ class RegisterTextField extends StatelessWidget {
     this.controller,
     this.textInputType,
     this.textInputAction,
+    this.enabled,
   }) : super(key: key);
 
   @override
@@ -32,10 +34,11 @@ class RegisterTextField extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
+            color: enabled == false ? Colors.grey.shade300 : Colors.white,
             border: Border.all(color: R.appCOLORS.greyBorderColor),
           ),
           child: TextField(
+            enabled: enabled,
             keyboardType: textInputType,
             textInputAction: textInputAction,
             controller: controller,

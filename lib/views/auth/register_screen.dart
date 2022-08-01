@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/helpers/user_helpers.dart';
+import 'package:latihan_soal_app/models/network_response/network_responses.dart';
+import 'package:latihan_soal_app/models/user_by_email.dart';
+import 'package:latihan_soal_app/repository/auth_api.dart';
 import 'package:latihan_soal_app/widgets/gender_field_select.dart';
 import 'package:latihan_soal_app/widgets/login_button.dart';
 import 'package:latihan_soal_app/widgets/register_text_field.dart';
@@ -15,7 +19,7 @@ class RegisterScreen extends StatefulWidget {
 enum Gender { lakiLaki, perempuan }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  String gender = '';
+  String? gender;
 
   onTapGender(Gender genderInput) {
     switch (genderInput) {
@@ -29,13 +33,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {});
   }
 
-  List<String> allClassSLTA = ['10', '11', '12'];
+  List<String> allKelasSLTA = ['10', '11', '12'];
 
-  String selectedClass = '';
+  String? selectedKelas;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
-  TextEditingController schoolController = TextEditingController();
+  TextEditingController schoolNameController = TextEditingController();
+
+  initDataUser() {
+    emailController.text = UserHelpers.getUserEmail() ?? '';
+    fullNameController.text = UserHelpers.getUserDisplayName() ?? '';
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    initDataUser();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,12 +98,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
               R.appSTRINGS.daftarText,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
-            onTap: () {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                R.appRoutesTO.mainScreen,
-                (route) => false,
-              );
+            onTap: () async {
+              final jsonDataUser = {
+                'email': emailController.text,
+                'nama_lengkap': fullNameController.text,
+                'nama_sekolah': schoolNameController.text,
+                'kelas': selectedKelas,
+                'gender': gender,
+                'foto': UserHelpers.getUserPhotoURL(),
+              };
+
+              final result = await AuthAPI().postRegister(jsonDataUser);
+
+              if (result.status == Status.success) {
+                // Cek apakah statusnya == 1 sesuai response API?
+                final registerResult = UserByEmail.fromJson(result.data ?? {});
+
+                if (registerResult.status == 1) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    R.appRoutesTO.mainScreen,
+                    (route) => false,
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        registerResult.message ?? '',
+                      ),
+                    ),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      R.appSTRINGS.pesanErrorRegisText,
+                    ),
+                  ),
+                );
+              }
             },
           ),
         ),
@@ -100,6 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const SizedBox(height: 20),
               RegisterTextField(
+                enabled: false,
                 labelText: 'Email',
                 hintText: 'contoh : hatchibee@email.com',
                 controller: emailController,
@@ -171,8 +222,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: R.appCOLORS.greyHintTextColor,
                       ),
                     ),
-                    value: selectedClass == '' ? null : selectedClass,
-                    items: allClassSLTA
+                    value: selectedKelas == '' ? null : selectedKelas,
+                    items: allKelasSLTA
                         .map(
                           (classSLTA) => DropdownMenuItem<String>(
                             value: classSLTA,
@@ -182,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         .toList(),
                     onChanged: (newClassSLTA) {
                       setState(() {
-                        selectedClass = newClassSLTA!;
+                        selectedKelas = newClassSLTA!;
                       });
                     },
                   ),
@@ -192,7 +243,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               RegisterTextField(
                 labelText: 'Nama Sekolah',
                 hintText: 'nama sekolah',
-                controller: schoolController,
+                controller: schoolNameController,
                 textInputAction: TextInputAction.done,
               ),
             ],

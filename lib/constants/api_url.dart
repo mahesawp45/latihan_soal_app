@@ -1,14 +1,18 @@
 class ApiUrl {
   static String baseURL = 'https://ekskul.id/api/';
   static String apiKEY = '18be70c0-4e4d-44ff-a475-50c51ece99a0';
+}
 
-  // endpoint
-  // user
+// endpoint
+// user
+class ApiUserUrl {
   static String users = "users";
   static String userRegistration = "users/registrasi";
   static String userUpdateProfile = "users/update";
+}
 
-  // Latihan Soal
+// Latihan Soal
+class ApiLatihanSoal {
   static String latihanMapel = "exercise/data_course";
   static String latihanPaketSoal = "exercise/data_exercise";
   static String latihanKerjakanSoal = "/exercise/kerjakan";
