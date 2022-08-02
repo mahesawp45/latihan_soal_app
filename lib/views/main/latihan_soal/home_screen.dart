@@ -4,6 +4,7 @@ import 'package:latihan_soal_app/models/banner_list.dart';
 import 'package:latihan_soal_app/models/mapel_list.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
 import 'package:latihan_soal_app/widgets/mapel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -164,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               : ListView.builder(
+                  //ini Kalau Listview Column harus di isi shrinkWrap true, physic biar engga error krn ScrollView/Listview
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount:
@@ -171,10 +173,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final currentMapel = mapelList.data![index];
 
-                    return MapelWidget(
-                      totalDone: currentMapel.jumlahDone ?? 0,
-                      totalPacket: currentMapel.jumlahMateri ?? 0,
-                      title: currentMapel.courseName ?? '',
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PaketSoalScreen(id: currentMapel.courseId),
+                          ),
+                        );
+                      },
+                      child: MapelWidget(
+                        totalDone: currentMapel.jumlahDone ?? 0,
+                        totalPacket: currentMapel.jumlahMateri ?? 0,
+                        title: currentMapel.courseName ?? '',
+                      ),
                     );
                   })
         ],

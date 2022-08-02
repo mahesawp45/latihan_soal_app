@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/models/mapel_list.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
 import 'package:latihan_soal_app/widgets/mapel.dart';
 
 class MapelScreen extends StatelessWidget {
@@ -34,8 +35,18 @@ class MapelScreen extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(
-                          context, R.appRoutesTO.paketSoalScreen);
+                      // Navigator.pushNamed(
+                      //   context,
+                      //   R.appRoutesTO.paketSoalScreen,
+                      //   arguments: currentMapel.courseId,
+                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PaketSoalScreen(id: currentMapel.courseId),
+                        ),
+                      );
                     },
                     child: MapelWidget(
                       totalDone: currentMapel.jumlahDone ?? 0,

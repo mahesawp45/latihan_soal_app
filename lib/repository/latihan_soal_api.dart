@@ -68,6 +68,16 @@ class LatihanSoalAPI {
     return result;
   }
 
+  /// Method get Paket Soal
+  Future<NetworkResponses> getPaketSoal(id) async {
+    final result =
+        await _getRequest(endPoint: ApiLatihanSoal.latihanPaketSoal, params: {
+      'course_id': id,
+      'user_email': UserHelpers.getUserEmail(),
+    });
+    return result;
+  }
+
   /// Method get Banner
   Future<NetworkResponses> getBanner() async {
     final result = await _getRequest(
