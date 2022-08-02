@@ -23,7 +23,7 @@ class ProgressBarWidget extends StatelessWidget {
         ),
         Container(
           height: 5,
-          width: MediaQuery.of(context).size.width * 0.4,
+          width: MediaQuery.of(context).size.width * 0.1,
           decoration: BoxDecoration(
             color: R.appCOLORS.primaryColor,
             borderRadius: BorderRadius.circular(10),

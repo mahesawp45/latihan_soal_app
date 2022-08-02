@@ -35,6 +35,7 @@ class PreferenceHelpers {
   Future setUserData(UserData userDataModel) async {
     // Step untuk mendapatkan data string dari model
     // ubah model ke json
+    // ini dia sudah isi data dari API dari proses sebelum"nya
     final json = userDataModel.toJson();
 
     // ubah json ke string

@@ -19,3 +19,7 @@ class ApiLatihanSoal {
   static String latihanSubmitJawaban = "/exercise/input_jawaban";
   static String latihanSkor = "/exercise/score_result";
 }
+
+class ApiBanner {
+  static String banner = "event/list";
+}

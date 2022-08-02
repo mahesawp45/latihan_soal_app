@@ -6,8 +6,15 @@ import 'package:latihan_soal_app/widgets/progress_bar.dart';
 ///
 /// untuk menampilkan nama Mapel. jumlah paket soal dan Progress
 class MapelWidget extends StatelessWidget {
+  final String title;
+  final int totalDone;
+  final int totalPacket;
+
   const MapelWidget({
     Key? key,
+    required this.title,
+    required this.totalDone,
+    required this.totalPacket,
   }) : super(key: key);
 
   @override
@@ -40,15 +47,15 @@ class MapelWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Matematika',
-                  style: TextStyle(
+                Text(
+                  title,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '0/50 Paket latihan soal',
+                  '$totalDone/$totalPacket Paket latihan soal',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

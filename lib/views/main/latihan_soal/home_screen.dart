@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/models/banner_list.dart';
+import 'package:latihan_soal_app/models/mapel_list.dart';
+import 'package:latihan_soal_app/models/network_response/network_responses.dart';
+import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
 import 'package:latihan_soal_app/widgets/mapel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,6 +14,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  MapelList? mapelList;
+  BannerList? bannerList;
+
+  getMapel() async {
+    final mapelResult = await LatihanSoalAPI().getMapel();
+
+    if (mapelResult.status == Status.success) {
+      mapelList = MapelList.fromJson(mapelResult.data!);
+      setState(() {});
+    }
+  }
+
+  getBanner() async {
+    final bannerResult = await LatihanSoalAPI().getBanner();
+
+    if (bannerResult.status == Status.success) {
+      bannerList = BannerList.fromJson(bannerResult.data!);
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getMapel();
+    getBanner();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildHomeUserProfile(),
               _buildHomeTopBanner(context),
-              _buildHomeListMapel(),
+              _buildHomeListMapel(mapelList),
               SizedBox(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,28 +72,46 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 50),
-                      height: 150,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (index < 4) {
-                            return Container(
-                              margin: const EdgeInsets.only(left: 20),
-                              child: Image.asset(R.appASSETS.homeBannerICON),
-                            );
-                          } else {
-                            return Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: Image.asset(R.appASSETS.homeBannerICON),
-                            );
-                          }
-                        },
-                      ),
-                    ),
+                    bannerList == null
+                        ? const SizedBox(
+                            height: 70,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : Container(
+                            margin: const EdgeInsets.only(bottom: 100),
+                            height: 150,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: bannerList?.data?.length ?? 4,
+                              itemBuilder: (BuildContext context, int index) {
+                                final currentBanner = bannerList!.data![index];
+
+                                if (index <
+                                    ((bannerList?.data?.length ?? 4) - 1)) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(left: 20),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                          currentBanner.eventImage ?? ''),
+                                    ),
+                                  );
+                                } else {
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                          currentBanner.eventImage ?? ''),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
                   ],
                 ),
               ),
@@ -67,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _buildHomeListMapel() {
+  Container _buildHomeListMapel(MapelList? mapelList) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 21),
       child: Column(
@@ -84,7 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, R.appRoutesTO.mapelScreen);
+                  Navigator.pushNamed(
+                    context,
+                    R.appRoutesTO.mapelScreen,
+                    arguments: mapelList!.data,
+                  );
                 },
                 child: Text(
                   R.appSTRINGS.lihatSemuaText,
@@ -97,9 +156,27 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const MapelWidget(),
-          const MapelWidget(),
-          const MapelWidget(),
+          mapelList == null
+              ? const SizedBox(
+                  height: 100,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount:
+                      mapelList.data!.length > 3 ? 3 : mapelList.data!.length,
+                  itemBuilder: (context, index) {
+                    final currentMapel = mapelList.data![index];
+
+                    return MapelWidget(
+                      totalDone: currentMapel.jumlahDone ?? 0,
+                      totalPacket: currentMapel.jumlahMateri ?? 0,
+                      title: currentMapel.courseName ?? '',
+                    );
+                  })
         ],
       ),
     );
