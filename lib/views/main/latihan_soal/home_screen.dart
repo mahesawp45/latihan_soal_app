@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/models/banner_list.dart';
@@ -36,11 +37,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  setUpFCM() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    // Get token untuk test FCM
+    final tokenFcm = await FirebaseMessaging.instance.getToken();
+
+    print(tokenFcm);
+
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    print('User granted permission: ${settings.authorizationStatus}');
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    // if (initialMessage != null) {
+    //   _handleMessage(initialMessage);
+    // }
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getMapel();
     getBanner();
+    setUpFCM();
   }
 
   @override

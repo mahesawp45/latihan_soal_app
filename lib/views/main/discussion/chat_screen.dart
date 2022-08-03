@@ -60,86 +60,114 @@ class _ChatScreenState extends State<ChatScreen> {
                     final currentDate =
                         (currentChat?['sent'] as Timestamp?)?.toDate();
 
-                    return Container(
-                      margin: const EdgeInsets.only(
-                          bottom: 15, right: 15, left: 15),
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Column(
-                        crossAxisAlignment: user.uid == currentChat?['uid']
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            currentChat?['name'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Color(0xff5200ff),
+                    return currentChat == null
+                        ? Container(
+                            margin: const EdgeInsets.only(
+                              bottom: 15,
+                              right: 15,
+                              left: 15,
                             ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: user.uid == currentChat?['uid']
-                                  ? R.appCOLORS.primaryColor
-                                  : Colors.pink.withOpacity(0.1),
-                              borderRadius: user.uid == currentChat?['uid']
-                                  ? const BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    )
-                                  : const BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                      bottomRight: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
+                            color: R.appCOLORS.primaryColor,
+                          )
+                        : Container(
+                            margin: const EdgeInsets.only(
+                                bottom: 15, right: 15, left: 30),
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Column(
+                              crossAxisAlignment: user.uid == currentChat['uid']
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  currentChat['name'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xff5200ff),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: user.uid == currentChat['uid']
+                                        ? R.appCOLORS.primaryColor
+                                        : Colors.pink.withOpacity(0.1),
+                                    borderRadius: user.uid == currentChat['uid']
+                                        ? const BorderRadius.only(
+                                            bottomLeft: Radius.circular(20),
+                                            topLeft: Radius.circular(20),
+                                            topRight: Radius.circular(20),
+                                          )
+                                        : const BorderRadius.only(
+                                            bottomLeft: Radius.circular(20),
+                                            bottomRight: Radius.circular(20),
+                                            topRight: Radius.circular(20),
+                                          ),
+                                  ),
+                                  child: currentChat['type'] == 'file'
+                                      ? Image.network(
+                                          currentChat['file_url'],
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(Icons.warning),
+                                            );
+                                          },
+                                        )
+                                      : Text(
+                                          currentChat['content'] ?? '',
+                                          style: TextStyle(
+                                            color:
+                                                user.uid == currentChat['uid']
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                          ),
+                                        ),
+                                ),
+                                Text(
+                                  currentDate == null
+                                      ? 'mengirim..'
+                                      : currentDate.day ==
+                                                  (DateTime.now().day - 1) &&
+                                              currentDate.month <=
+                                                  DateTime.now().month &&
+                                              currentDate.year <=
+                                                  DateTime.now().year
+                                          ? "Kemarin pada ${currentDate.hour}:${currentDate.minute}" //Kemarin
+                                          : currentDate.hour ==
+                                                  DateTime.now().hour
+                                              ? (DateTime.now().minute -
+                                                          (currentDate)
+                                                              .minute) ==
+                                                      0
+                                                  ? 'sekarang' // saat ini juga
+                                                  : '${DateTime.now().minute - (currentDate).minute}m' // sebelum 1 jam hari ini
+                                              : currentDate.day <=
+                                                          (DateTime.now().day -
+                                                              2) ||
+                                                      currentDate.day !=
+                                                              (DateTime.now()
+                                                                      .day -
+                                                                  2) &&
+                                                          currentDate.month <=
+                                                              (DateTime.now()
+                                                                  .month) &&
+                                                          currentDate.year <=
+                                                              DateTime.now()
+                                                                  .year
+                                                  ? DateFormat(
+                                                          'dd MMM yyy, HH:mm')
+                                                      .format(
+                                                          currentDate) // 2 hari atau lebih sebelum hari ini
+                                                  : "${currentDate.hour}:${currentDate.minute}", // Hari ini
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: R.appCOLORS.greySubtitleColor,
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: Text(
-                              currentChat?['content'] ?? '',
-                              style: TextStyle(
-                                color: user.uid == currentChat?['uid']
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            currentDate == null
-                                ? 'mengirim..'
-                                : currentDate.day == (DateTime.now().day - 1) &&
-                                        currentDate.month <=
-                                            DateTime.now().month &&
-                                        currentDate.year <= DateTime.now().year
-                                    ? "Kemarin pada ${currentDate.hour}:${currentDate.minute}" //Kemarin
-                                    : currentDate.hour == DateTime.now().hour
-                                        ? (DateTime.now().minute -
-                                                    (currentDate).minute) ==
-                                                0
-                                            ? 'sekarang' // saat ini juga
-                                            : '${DateTime.now().minute - (currentDate).minute}m' // sebelum 1 jam hari ini
-                                        : currentDate.day <=
-                                                    (DateTime.now().day - 2) ||
-                                                currentDate.day !=
-                                                        (DateTime.now().day -
-                                                            2) &&
-                                                    currentDate.month <=
-                                                        (DateTime.now()
-                                                            .month) &&
-                                                    currentDate.year <=
-                                                        DateTime.now().year
-                                            ? DateFormat('dd MMM yyy, HH:mm')
-                                                .format(
-                                                    currentDate) // 2 hari atau lebih sebelum hari ini
-                                            : "${currentDate.hour}:${currentDate.minute}", // Hari ini
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: R.appCOLORS.greySubtitleColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                          );
                   },
                 );
               },
@@ -194,8 +222,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              final imgResult = await ImagePicker()
-                                  .pickImage(source: ImageSource.camera);
+                              final imgResult = await ImagePicker().pickImage(
+                                source: ImageSource.camera,
+                                imageQuality: 30,
+                                maxHeight: 500,
+                                maxWidth: 500,
+                              );
 
                               if (imgResult != null) {
                                 // ubah data Xfile ke File biar bisa dikirim ke Firebase
@@ -230,6 +262,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                   'content': textEditingController.text,
                                   'sent': FieldValue.serverTimestamp(),
                                 };
+
+                                chat.add(chatContent).whenComplete(
+                                  () {
+                                    textEditingController.clear();
+                                  },
+                                );
                               }
                             },
                             child: Icon(
