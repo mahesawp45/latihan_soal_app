@@ -13,4 +13,5 @@ class AppRoutesTO {
   //Latihan Soal Screen
   final String mapelScreen = '/mapel-screen';
   final String paketSoalScreen = '/paket-latihan-screen';
+  final String kerjakanSoalScreen = '/kerjakan-latihan-soal-screen';
 }

@@ -3,6 +3,7 @@ import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/paket_soal_list.dart';
 import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/kerjakan_latihan_soal_screen.dart';
 
 class PaketSoalScreen extends StatefulWidget {
   final String? id;
@@ -65,11 +66,26 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
                           children: List.generate(
                             paketSoalList?.data?.length ?? 0,
                             (index) {
-                              return Container(
-                                padding: const EdgeInsets.all(3),
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                child: PaketSoalWidget(
-                                  data: paketSoalList!.data![index],
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          KerjakanLatihanSoalScreen(
+                                        id: paketSoalList
+                                            ?.data?[index].exerciseId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  child: PaketSoalWidget(
+                                    data: paketSoalList!.data![index],
+                                  ),
                                 ),
                               );
                             },

@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  final String? id;
+
+  const ChatScreen({Key? key, this.id}) : super(key: key);
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -99,24 +105,33 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                           ),
                           Text(
-                            currentDate?.day == (DateTime.now().day - 1)
-                                ? "Yesterday at ${currentDate?.hour ?? ''}:${currentDate?.minute ?? ''}" //Kemarin
-                                : currentDate?.hour == DateTime.now().hour
-                                    ? (DateTime.now().minute -
-                                                (currentDate ?? DateTime.now())
-                                                    .minute) ==
-                                            0
-                                        ? 'now' // saat ini juga
-                                        : '${DateTime.now().minute - (currentDate ?? DateTime.now()).minute}m' // sebelum 1 jam hari ini
-                                    : currentDate?.day !=
-                                                (DateTime.now().day - 1) &&
-                                            currentDate?.month !=
-                                                (DateTime.now().month)
-                                        ? DateFormat('dd MMM yyy, HH:mm')
-                                            .format(currentDate ??
-                                                DateTime
-                                                    .now()) // 2 hari sebelum hari ini
-                                        : "${currentDate?.hour ?? ''}:${currentDate?.minute ?? ''}", // Hari ini
+                            currentDate == null
+                                ? 'mengirim..'
+                                : currentDate.day == (DateTime.now().day - 1) &&
+                                        currentDate.month <=
+                                            DateTime.now().month &&
+                                        currentDate.year <= DateTime.now().year
+                                    ? "Kemarin pada ${currentDate.hour}:${currentDate.minute}" //Kemarin
+                                    : currentDate.hour == DateTime.now().hour
+                                        ? (DateTime.now().minute -
+                                                    (currentDate).minute) ==
+                                                0
+                                            ? 'sekarang' // saat ini juga
+                                            : '${DateTime.now().minute - (currentDate).minute}m' // sebelum 1 jam hari ini
+                                        : currentDate.day <=
+                                                    (DateTime.now().day - 2) ||
+                                                currentDate.day !=
+                                                        (DateTime.now().day -
+                                                            2) &&
+                                                    currentDate.month <=
+                                                        (DateTime.now()
+                                                            .month) &&
+                                                    currentDate.year <=
+                                                        DateTime.now().year
+                                            ? DateFormat('dd MMM yyy, HH:mm')
+                                                .format(
+                                                    currentDate) // 2 hari atau lebih sebelum hari ini
+                                            : "${currentDate.hour}:${currentDate.minute}", // Hari ini
                             style: TextStyle(
                               fontSize: 10,
                               color: R.appCOLORS.greySubtitleColor,
@@ -178,7 +193,45 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () async {
+                              final imgResult = await ImagePicker()
+                                  .pickImage(source: ImageSource.camera);
+
+                              if (imgResult != null) {
+                                // ubah data Xfile ke File biar bisa dikirim ke Firebase
+                                File file = File(imgResult.path);
+
+                                // ambil nama file di local
+                                // final name = imgResult.path.split('/');
+
+                                final room = widget.id ?? 'kimia';
+
+                                final String ref =
+                                    'chats/$room/${user.uid}/${imgResult.name}';
+
+                                // Masukkan data/foto ke FirebaseStore
+                                final imgResUpload = await FirebaseStorage
+                                    .instance
+                                    .ref()
+                                    .child(ref)
+                                    .putFile(file);
+
+                                final url =
+                                    await imgResUpload.ref.getDownloadURL();
+
+                                final chatContent = {
+                                  'uid': user.uid,
+                                  'name': user.displayName ?? '',
+                                  'email': user.email ?? '',
+                                  'photoURL': user.photoURL ?? '',
+                                  'ref': ref,
+                                  'type': 'file',
+                                  'file_url': url,
+                                  'content': textEditingController.text,
+                                  'sent': FieldValue.serverTimestamp(),
+                                };
+                              }
+                            },
                             child: Icon(
                               Icons.camera_alt,
                               color: R.appCOLORS.primaryColor,
@@ -201,6 +254,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           'name': user.displayName ?? '',
                           'email': user.email ?? '',
                           'photoURL': user.photoURL ?? '',
+                          'ref': null,
+                          'type': 'text',
+                          'file_url': null,
                           'content': textEditingController.text,
                           'sent': FieldValue.serverTimestamp(),
                         };

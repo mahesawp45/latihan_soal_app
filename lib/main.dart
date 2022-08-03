@@ -5,6 +5,7 @@ import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/views/auth/login_screen.dart';
 import 'package:latihan_soal_app/views/main/discussion/chat_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
+import 'package:latihan_soal_app/views/main/latihan_soal/kerjakan_latihan_soal_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/mapel_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
 import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
@@ -62,6 +63,8 @@ class MyApp extends StatelessWidget {
         // Latihan soal
         R.appRoutesTO.mapelScreen: (context) => const MapelScreen(),
         R.appRoutesTO.paketSoalScreen: (context) => const PaketSoalScreen(),
+        R.appRoutesTO.kerjakanSoalScreen: (context) =>
+            const KerjakanLatihanSoalScreen(),
       },
     );
   }

@@ -91,12 +91,15 @@ class LatihanSoalAPI {
   }
 
   /// Method post user yang akan register
-  // Future<NetworkResponses> postRegister(json) async {
-  //   final result = await _postRequest(
-  //     endPoint: ApiLatihanSoal.latihanKerjakanSoal,
-  //     body: json,
-  //   );
+  Future<NetworkResponses> postKerjakanSoal(id) async {
+    final result = await _postRequest(
+      endPoint: ApiLatihanSoal.latihanKerjakanSoal,
+      body: {
+        'exercise_id': id,
+        'user_email': UserHelpers.getUserEmail(),
+      },
+    );
 
-  //   return result;
-  // }
+    return result;
+  }
 }
