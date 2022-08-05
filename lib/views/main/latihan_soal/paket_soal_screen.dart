@@ -73,8 +73,10 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           KerjakanLatihanSoalScreen(
-                                        id: paketSoalList
-                                            ?.data?[index].exerciseId,
+                                        id: paketSoalList!
+                                            .data![index].exerciseId,
+                                        title: paketSoalList!
+                                            .data![index].exerciseTitle,
                                       ),
                                     ),
                                   );

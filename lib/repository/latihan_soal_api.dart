@@ -90,7 +90,7 @@ class LatihanSoalAPI {
     return result;
   }
 
-  /// Method post user yang akan register
+  /// Method post user yang mau ngerjain soal
   Future<NetworkResponses> postKerjakanSoal(id) async {
     final result = await _postRequest(
       endPoint: ApiLatihanSoal.latihanKerjakanSoal,
@@ -100,6 +100,28 @@ class LatihanSoalAPI {
       },
     );
 
+    return result;
+  }
+
+  /// Method post user yang mau ngirim jawaban yg udah disubmit
+  Future<NetworkResponses> postInputJawaban(payload) async {
+    final result = await _postRequest(
+      endPoint: ApiLatihanSoal.latihanSubmitJawaban,
+      body: payload,
+    );
+
+    return result;
+  }
+
+  /// Method get user result dari ngerjain soal
+  Future<NetworkResponses> getScoreResult(id) async {
+    final result = await _getRequest(
+      endPoint: ApiLatihanSoal.latihanSkor,
+      params: {
+        'exercise_id': id,
+        'user_email': UserHelpers.getUserEmail(),
+      },
+    );
     return result;
   }
 }

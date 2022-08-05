@@ -26,4 +26,9 @@ class AppSTRINGS {
   final String editText = 'Edit';
   final String keluarText = 'Keluar';
   final String identitasDiriText = 'Identitas Diri';
+
+  // Latihan soal
+  final String selamatText = 'Selamat';
+  final String congratsResultText = 'Kamu telah menyelesaikan Kuiz ini';
+  final String nilaiKamuText = 'Nilai kamu:';
 }

@@ -9,11 +9,17 @@ import 'package:latihan_soal_app/models/network_response/network_responses.dart'
 import 'package:latihan_soal_app/models/user_by_email.dart';
 import 'package:latihan_soal_app/repository/auth_api.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
     Timer(
       const Duration(seconds: 3),
       () async {
@@ -43,7 +49,10 @@ class SplashScreen extends StatelessWidget {
         }
       },
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: R.appCOLORS.primaryColor,
       body: Center(

@@ -18,4 +18,8 @@ class AppASSETS {
 
   // profile
   final String logoutICON = "assets/ic_logout.png";
+
+  // Latihan Soal
+  final String successICON = "assets/img_success.png";
+  final String resultICON = "assets/img_result.png";
 }
