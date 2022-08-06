@@ -7,11 +7,14 @@ class AppASSETS {
 
   // Home Screen
   final String homeICON = "assets/ic_home.png";
+  final String homeUnActiveICON = "assets/ic_home_unactive.png";
   final String discussICON = "assets/ic_discuss.png";
   final String avatarICON = "assets/ic_avatar.png";
   final String homeTopBannerICON = "assets/img_home.png";
   final String atomICON = "assets/ic_atom.png";
   final String homeBannerICON = "assets/img_banner.png";
+  final String profileICON = "assets/ic_profile.png";
+  final String profileUnActiveICON = "assets/ic_profile_unactive.png";
 
   // Mapel
   final String noteICON = "assets/ic_note.png";

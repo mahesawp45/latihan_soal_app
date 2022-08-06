@@ -68,12 +68,18 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 BottomNavigationMainMenuButton(
                   title: 'Home',
-                  child: Image.asset(R.appASSETS.homeICON, height: 20),
+                  child: Image.asset(
+                    index == 0
+                        ? R.appASSETS.homeICON
+                        : R.appASSETS.homeUnActiveICON,
+                    height: 20,
+                  ),
                   onTap: () {
                     index = 0;
                     _pageController.animateToPage(index,
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeInOut);
+                    setState(() {});
                   },
                 ),
                 BottomNavigationMainMenuButton(
@@ -83,12 +89,18 @@ class _MainScreenState extends State<MainScreen> {
                     }),
                 BottomNavigationMainMenuButton(
                   title: 'Profile',
-                  child: const Icon(Icons.person),
+                  child: Image.asset(
+                    index == 1
+                        ? R.appASSETS.profileICON
+                        : R.appASSETS.profileUnActiveICON,
+                    height: 20,
+                  ),
                   onTap: () {
                     index = 1;
                     _pageController.animateToPage(index,
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeInOut);
+                    setState(() {});
                   },
                 ),
               ],

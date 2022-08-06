@@ -1,9 +1,11 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/helpers/preference_helpers.dart';
 import 'package:latihan_soal_app/models/banner_list.dart';
 import 'package:latihan_soal_app/models/mapel_list.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
+import 'package:latihan_soal_app/models/user_by_email.dart';
 import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
 import 'package:latihan_soal_app/widgets/mapel.dart';
@@ -74,9 +76,18 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  UserData? user;
+
+  getUserData() async {
+    user = await PreferenceHelpers().getUserData();
+
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
+    getUserData();
     getMapel();
     getBanner();
     setUpFCM();
@@ -287,15 +298,15 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'Halo Nama User',
-                  style: TextStyle(
+                  'Halo ${user!.userName ?? ""}👋',
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(
+                const Text(
                   'Selamat Datang',
                   style: TextStyle(
                     fontSize: 12,
