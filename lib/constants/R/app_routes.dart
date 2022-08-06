@@ -14,4 +14,7 @@ class AppRoutesTO {
   final String mapelScreen = '/mapel-screen';
   final String paketSoalScreen = '/paket-latihan-screen';
   final String kerjakanSoalScreen = '/kerjakan-latihan-soal-screen';
+
+  // Profile
+  final String editProfileScreen = '/edit-profile-screen';
 }

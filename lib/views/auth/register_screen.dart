@@ -237,7 +237,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         .toList(),
                     onChanged: (newClassSLTA) {
                       setState(() {
-                        selectedKelas = newClassSLTA!;
+                        selectedKelas = newClassSLTA;
                       });
                     },
                   ),

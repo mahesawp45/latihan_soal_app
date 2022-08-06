@@ -9,6 +9,7 @@ import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/kerjakan_latihan_soal_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/mapel_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/paket_soal_screen.dart';
+import 'package:latihan_soal_app/views/main/profile/edit_profile_screen.dart';
 import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
 import 'package:latihan_soal_app/views/main_screen.dart';
 import 'package:latihan_soal_app/views/auth/register_screen.dart';
@@ -79,6 +80,9 @@ class MyApp extends StatelessWidget {
         R.appRoutesTO.paketSoalScreen: (context) => const PaketSoalScreen(),
         R.appRoutesTO.kerjakanSoalScreen: (context) =>
             const KerjakanLatihanSoalScreen(),
+
+        // Profile
+        R.appRoutesTO.editProfileScreen: (context) => const EditProfileScreen(),
       },
     );
   }

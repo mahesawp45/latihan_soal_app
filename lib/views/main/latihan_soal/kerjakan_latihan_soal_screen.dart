@@ -162,11 +162,11 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
                 // TabBar UNTUK NOMOR
                 Container(
                   margin: const EdgeInsets.only(top: 10),
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding:
+                      const EdgeInsets.only(bottom: 10, left: 10, right: 10),
                   height: 50,
-                  decoration: BoxDecoration(
-                      // color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(100)),
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(100)),
                   child: TabBar(
                     onTap: (value) {},
                     controller: _controller,
@@ -178,8 +178,6 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
                         borderRadius: BorderRadius.circular(100)),
                     labelColor: R.appCOLORS.primaryColor,
                     unselectedLabelColor: Colors.black,
-                    unselectedLabelStyle:
-                        const TextStyle(backgroundColor: Colors.white),
                     tabs: List.generate(
                       kerjakanSoalList!.data!.length,
                       (index) => Tab(

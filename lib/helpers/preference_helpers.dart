@@ -24,7 +24,7 @@ class PreferenceHelpers {
   /// MEMBACA DATA DENGAN SHAREDPREFERENCE
   Future _getString(key) async {
     final pref = await _sharedPref();
-    pref.getString(key);
+    return pref.getString(key);
   }
 
   /// MENULIS DATA DARI MODEL KE SHAREDPREFERENCE,

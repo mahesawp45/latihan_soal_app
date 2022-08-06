@@ -26,6 +26,7 @@ class AppSTRINGS {
   final String editText = 'Edit';
   final String keluarText = 'Keluar';
   final String identitasDiriText = 'Identitas Diri';
+  final String perbaharuiAkun = 'Perbaharui Akun';
 
   // Latihan soal
   final String selamatText = 'Selamat';

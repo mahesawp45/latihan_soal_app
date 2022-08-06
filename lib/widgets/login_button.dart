@@ -7,6 +7,7 @@ class LoginButton extends StatelessWidget {
   final String? iconButton;
   final Widget child;
   final VoidCallback onTap;
+  final double? radius;
 
   const LoginButton({
     Key? key,
@@ -15,6 +16,7 @@ class LoginButton extends StatelessWidget {
     this.iconButton,
     required this.child,
     required this.onTap,
+    this.radius,
   }) : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class LoginButton extends StatelessWidget {
           primary: backgroundColor,
           fixedSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(radius ?? 25),
             side: BorderSide(
               color: borderColor,
             ),
