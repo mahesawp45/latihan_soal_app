@@ -44,11 +44,20 @@ dependencies:
   intl: ^0.17.0
   provider: ^6.0.3
   shared_preferences: ^2.0.15
+  
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.10.0
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/img_result.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+ 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
