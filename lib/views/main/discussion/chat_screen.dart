@@ -2,12 +2,13 @@ import 'dart:io';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/providers/chat_provider.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? id;
@@ -19,18 +20,14 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  TextEditingController textEditingController = TextEditingController();
-  late CollectionReference chat;
-  final user = FirebaseAuth.instance.currentUser!;
+  ChatProvider? chatProvider;
+
   final listViewController = ScrollController();
 
   @override
   void initState() {
-    chat = FirebaseFirestore.instance
-        .collection("room")
-        .doc("kimia")
-        .collection("chat");
-
+    chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    chatProvider!.initChat();
     super.initState();
   }
 
@@ -40,200 +37,212 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('Diskusi Soal'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: chat.orderBy('sent', descending: true).snapshots(),
-              builder:
-                  (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      body: Consumer<ChatProvider>(builder: (context, chatProvider, child) {
+        return Column(
+          children: [
+            Expanded(
+              child: StreamBuilder(
+                stream: chatProvider.chat
+                    .orderBy('sent', descending: true)
+                    .snapshots(),
+                builder:
+                    (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                final listChat = snapshot.data?.docs;
-                return ListView.builder(
-                  reverse: true,
-                  controller: listViewController,
-                  itemCount: listChat?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    final currentChat = snapshot.data?.docs[index];
-                    final currentDate =
-                        (currentChat?['sent'] as Timestamp?)?.toDate();
+                  final listChat = snapshot.data?.docs;
+                  return ListView.builder(
+                    reverse: true,
+                    controller: listViewController,
+                    itemCount: listChat?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      final currentChat = snapshot.data?.docs[index];
+                      final currentDate =
+                          (currentChat?['sent'] as Timestamp?)?.toDate();
 
-                    return currentChat == null
-                        ? Container(
-                            height: 100,
-                            width: 100,
-                            color: R.appCOLORS.primaryColor,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                        : _buildChatWidget(currentChat, context, currentDate);
-                  },
-                );
-              },
-            ),
-          ),
-          SafeArea(
-            child: Container(
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                BoxShadow(
-                  blurRadius: 10,
-                  spreadRadius: 0,
-                  color: Colors.black.withOpacity(0.25),
-                  offset: const Offset(0, -1),
-                )
-              ]),
-              child: Row(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    decoration: BoxDecoration(
-                      color: R.appCOLORS.greyColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: IconButton(
-                      color: R.appCOLORS.primaryColor,
-                      onPressed: () {},
-                      icon: const Icon(Icons.add),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      decoration: BoxDecoration(
-                          color: R.appCOLORS.greyColor,
-                          borderRadius: BorderRadius.circular(40)),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              autofocus: false,
-                              keyboardType: TextInputType.multiline,
-                              controller: textEditingController,
-                              cursorColor: R.appCOLORS.primaryColor,
-                              decoration: const InputDecoration(
-                                  contentPadding: EdgeInsets.only(right: 10),
-                                  border: InputBorder.none,
-                                  hintText: 'Ketuk untuk menulis pesan..',
-                                  hintStyle: TextStyle(
-                                    fontSize: 15,
-                                  )),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              final imgResult = await ImagePicker().pickImage(
-                                source: ImageSource.camera,
-                                imageQuality: 30,
-                                maxHeight: 500,
-                                maxWidth: 500,
-                              );
-
-                              if (imgResult != null) {
-                                // ubah data Xfile ke File biar bisa dikirim ke Firebase
-                                File file = File(imgResult.path);
-
-                                // ambil nama file di local
-                                // final name = imgResult.path.split('/');
-
-                                final room = widget.id ?? 'kimia';
-
-                                final String ref =
-                                    'chats/$room/${user.uid}/${imgResult.name}';
-
-                                // Masukkan data/foto ke FirebaseStore
-                                final imgResUpload = await FirebaseStorage
-                                    .instance
-                                    .ref()
-                                    .child(ref)
-                                    .putFile(file);
-
-                                final url =
-                                    await imgResUpload.ref.getDownloadURL();
-
-                                final chatContent = {
-                                  'uid': user.uid,
-                                  'name': user.displayName ?? '',
-                                  'email': user.email ?? '',
-                                  'photoURL': user.photoURL ?? '',
-                                  'ref': ref,
-                                  'type': 'file',
-                                  'file_url': url,
-                                  'content': textEditingController.text,
-                                  'sent': FieldValue.serverTimestamp(),
-                                  'is_deleted': false,
-                                };
-
-                                chat.add(chatContent).whenComplete(
-                                  () {
-                                    textEditingController.clear();
-                                  },
-                                );
-                              }
-                            },
-                            child: Icon(
-                              Icons.camera_alt,
+                      return currentChat == null
+                          ? Container(
+                              height: 100,
+                              width: 100,
                               color: R.appCOLORS.primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: IconButton(
-                      onPressed: () {
-                        if (textEditingController.text.isEmpty) {
-                          return;
-                        }
-
-                        final chatContent = {
-                          'uid': user.uid,
-                          'name': user.displayName ?? '',
-                          'email': user.email ?? '',
-                          'photoURL': user.photoURL ?? '',
-                          'ref': null,
-                          'type': 'text',
-                          'file_url': null,
-                          'content': textEditingController.text,
-                          'sent': FieldValue.serverTimestamp(),
-                          'is_deleted': false,
-                        };
-
-                        // Masukkin data ke Firebase Store
-                        // chat.add(chatContent).whenComplete(() {
-                        //   getDataFromFirebase(); // Sementara untuk stream datanya bisa bgini
-                        // });
-                        // chat.add(chatContent).whenComplete(
-                        //   () {
-                        //     textEditingController.clear();
-                        //   },
-                        // );
-                        textEditingController.clear();
-                        chat.add(chatContent);
-                      },
-                      icon: Icon(
-                        Icons.send,
-                        color: R.appCOLORS.primaryColor,
-                      ),
-                    ),
-                  ),
-                ],
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : _buildChatWidget(
+                              currentChat, context, currentDate, chatProvider);
+                    },
+                  );
+                },
               ),
             ),
-          ),
-        ],
-      ),
+            SafeArea(
+              child: Container(
+                decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    spreadRadius: 0,
+                    color: Colors.black.withOpacity(0.25),
+                    offset: const Offset(0, -1),
+                  )
+                ]),
+                child: Row(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(
+                        color: R.appCOLORS.greyColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: IconButton(
+                        color: R.appCOLORS.primaryColor,
+                        onPressed: () {},
+                        icon: const Icon(Icons.add),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        decoration: BoxDecoration(
+                            color: R.appCOLORS.greyColor,
+                            borderRadius: BorderRadius.circular(40)),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                autofocus: false,
+                                keyboardType: TextInputType.multiline,
+                                controller: chatProvider.textEditingController,
+                                cursorColor: R.appCOLORS.primaryColor,
+                                decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.only(right: 10),
+                                    border: InputBorder.none,
+                                    hintText: 'Ketuk untuk menulis pesan..',
+                                    hintStyle: TextStyle(
+                                      fontSize: 15,
+                                    )),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                final imgResult = await ImagePicker().pickImage(
+                                  source: ImageSource.camera,
+                                  imageQuality: 30,
+                                  maxHeight: 500,
+                                  maxWidth: 500,
+                                );
+
+                                if (imgResult != null) {
+                                  // ubah data Xfile ke File biar bisa dikirim ke Firebase
+                                  File file = File(imgResult.path);
+
+                                  // ambil nama file di local
+                                  // final name = imgResult.path.split('/');
+
+                                  final room = widget.id ?? 'kimia';
+
+                                  final String ref =
+                                      'chats/$room/${chatProvider.user?.uid}/${imgResult.name}';
+
+                                  // Masukkan data/foto ke FirebaseStore
+                                  final imgResUpload = await FirebaseStorage
+                                      .instance
+                                      .ref()
+                                      .child(ref)
+                                      .putFile(file);
+
+                                  final url =
+                                      await imgResUpload.ref.getDownloadURL();
+
+                                  final chatContent = {
+                                    'uid': chatProvider.user?.uid,
+                                    'name':
+                                        chatProvider.user?.displayName ?? '',
+                                    'email': chatProvider.user?.email ?? '',
+                                    'photoURL':
+                                        chatProvider.user?.photoURL ?? '',
+                                    'ref': ref,
+                                    'type': 'file',
+                                    'file_url': url,
+                                    'content': chatProvider
+                                        .textEditingController?.text,
+                                    'sent': FieldValue.serverTimestamp(),
+                                    'is_deleted': false,
+                                  };
+
+                                  chatProvider.chat
+                                      .add(chatContent)
+                                      .whenComplete(
+                                    () {
+                                      chatProvider.textEditingController
+                                          ?.clear();
+                                    },
+                                  );
+                                }
+                              },
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: R.appCOLORS.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: IconButton(
+                        onPressed: () {
+                          if (chatProvider
+                              .textEditingController!.text.isEmpty) {
+                            return;
+                          }
+
+                          final chatContent = {
+                            'uid': chatProvider.user?.uid,
+                            'name': chatProvider.user?.displayName ?? '',
+                            'email': chatProvider.user?.email ?? '',
+                            'photoURL': chatProvider.user?.photoURL ?? '',
+                            'ref': null,
+                            'type': 'text',
+                            'file_url': null,
+                            'content': chatProvider.textEditingController?.text,
+                            'sent': FieldValue.serverTimestamp(),
+                            'is_deleted': false,
+                          };
+
+                          // Masukkin data ke Firebase Store
+                          // chat.add(chatContent).whenComplete(() {
+                          //   getDataFromFirebase(); // Sementara untuk stream datanya bisa bgini
+                          // });
+                          // chat.add(chatContent).whenComplete(
+                          //   () {
+                          //     textEditingController.clear();
+                          //   },
+                          // );
+                          chatProvider.textEditingController?.clear();
+                          chatProvider.chat.add(chatContent);
+                        },
+                        icon: Icon(
+                          Icons.send,
+                          color: R.appCOLORS.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 
   GestureDetector _buildChatWidget(QueryDocumentSnapshot<Object?> currentChat,
-      BuildContext context, DateTime? currentDate) {
+      BuildContext context, DateTime? currentDate, ChatProvider? chatProvider) {
     return GestureDetector(
       // Untuk nampilin salin/hapus pesan
       onLongPress: () {
@@ -264,12 +273,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 });
                               },
                             ),
-                          if (user.uid == currentChat['uid'])
+                          if (chatProvider?.user?.uid == currentChat['uid'])
                             ListTile(
                               title: const Text('Hapus'),
                               onTap: () {
                                 String id = currentChat.id;
-                                chat.doc(id).update({
+                                chatProvider?.chat.doc(id).update({
                                   'is_deleted': true,
                                 }).then(
                                   (value) {
@@ -296,12 +305,12 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: EdgeInsets.only(
           top: 5,
           bottom: 10,
-          right: user.uid == currentChat['uid'] ? 15 : 30,
-          left: user.uid == currentChat['uid'] ? 30 : 15,
+          right: chatProvider?.user?.uid == currentChat['uid'] ? 15 : 30,
+          left: chatProvider?.user?.uid == currentChat['uid'] ? 30 : 15,
         ),
         width: MediaQuery.of(context).size.width * 0.8,
         child: Column(
-          crossAxisAlignment: user.uid == currentChat['uid']
+          crossAxisAlignment: chatProvider?.user?.uid == currentChat['uid']
               ? CrossAxisAlignment.end
               : CrossAxisAlignment.start,
           children: [
@@ -312,23 +321,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: Color(0xff5200ff),
               ),
             ),
-            _buildBaloonChat(currentChat),
-            _buildChatsTime(currentDate),
+            _buildBaloonChat(currentChat, chatProvider),
+            _buildChatsTime(currentDate, chatProvider),
           ],
         ),
       ),
     );
   }
 
-  Container _buildBaloonChat(QueryDocumentSnapshot<Object?> currentChat) {
+  Container _buildBaloonChat(
+      QueryDocumentSnapshot<Object?> currentChat, ChatProvider? chatProvider) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       decoration: currentChat['is_deleted']
           ? BoxDecoration(
-              color: user.uid == currentChat['uid']
+              color: chatProvider?.user?.uid == currentChat['uid']
                   ? R.appCOLORS.primaryColor.withOpacity(0.2)
                   : Colors.pink.withOpacity(0.1),
-              borderRadius: user.uid == currentChat['uid']
+              borderRadius: chatProvider?.user?.uid == currentChat['uid']
                   ? const BorderRadius.only(
                       bottomLeft: Radius.circular(20),
                       topLeft: Radius.circular(20),
@@ -341,10 +351,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
             )
           : BoxDecoration(
-              color: user.uid == currentChat['uid']
+              color: chatProvider?.user?.uid == currentChat['uid']
                   ? R.appCOLORS.primaryColor
                   : Colors.pink.withOpacity(0.1),
-              borderRadius: user.uid == currentChat['uid']
+              borderRadius: chatProvider?.user?.uid == currentChat['uid']
                   ? const BorderRadius.only(
                       bottomLeft: Radius.circular(20),
                       topLeft: Radius.circular(20),
@@ -357,12 +367,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
             ),
       child: currentChat['type'] == 'file' && currentChat['is_deleted'] == false
-          ? _buildImageChat(currentChat)
-          : _buildTextChat(currentChat),
+          ? _buildImageChat(currentChat, chatProvider)
+          : _buildTextChat(currentChat, chatProvider),
     );
   }
 
-  Text _buildChatsTime(DateTime? currentDate) {
+  Text _buildChatsTime(DateTime? currentDate, ChatProvider? chatProvider) {
     // BARU BANGET
     if (currentDate == null) {
       return Text(
@@ -430,7 +440,8 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Image _buildImageChat(QueryDocumentSnapshot<Object?> currentChat) {
+  Image _buildImageChat(
+      QueryDocumentSnapshot<Object?> currentChat, ChatProvider? chatProvider) {
     return Image.network(
       currentChat['file_url'],
       errorBuilder: (context, error, stackTrace) {
@@ -441,7 +452,8 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Text _buildTextChat(QueryDocumentSnapshot<Object?> currentChat) {
+  Text _buildTextChat(
+      QueryDocumentSnapshot<Object?> currentChat, ChatProvider? chatProvider) {
     return Text(
       currentChat['is_deleted']
           ? "Pesan telah dihapus"
@@ -452,8 +464,9 @@ class _ChatScreenState extends State<ChatScreen> {
               fontStyle: FontStyle.italic,
             )
           : TextStyle(
-              color:
-                  user.uid == currentChat['uid'] ? Colors.white : Colors.black,
+              color: chatProvider?.user?.uid == currentChat['uid']
+                  ? Colors.white
+                  : Colors.black,
             ),
     );
   }

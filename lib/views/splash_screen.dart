@@ -21,11 +21,13 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(
-      const Duration(seconds: 3),
+      const Duration(seconds: 2),
       () async {
         final user = UserHelpers.getUserEmail();
 
-        if (user != null) {
+        // print(user == '');
+
+        if (user != '') {
           final dataUser = await AuthAPI().getUserByEmail();
 
           if (dataUser.status == Status.success) {

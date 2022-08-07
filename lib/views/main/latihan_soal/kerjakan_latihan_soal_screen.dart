@@ -27,14 +27,9 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
   // instansiasi tabController wkt pemanggilan API berhasil krn harus dapat data length
   TabController? _controller;
 
-  @override
-  void initState() {
-    super.initState();
-    kerjakanSoalListProvider =
-        Provider.of<KerjakanSoalListProvider>(context, listen: false);
-    kerjakanSoalListProvider!.getDaftarSoalList(widget.id);
+  initTab() {
     _controller = TabController(
-        length: kerjakanSoalListProvider!.kerjakanSoalList!.data!.length,
+        length: kerjakanSoalListProvider?.kerjakanSoalList?.data?.length ?? 10,
         vsync: this);
     //Tambahkan SingleTickerProviderStateMixin
 
@@ -45,15 +40,25 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
   }
 
   @override
+  void initState() {
+    super.initState();
+    kerjakanSoalListProvider =
+        Provider.of<KerjakanSoalListProvider>(context, listen: false);
+    kerjakanSoalListProvider!.getDaftarSoalList(widget.id);
+    initTab();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title ?? 'Tunggu..'),
-      ),
-      // Tombol selanjutnya atau submit
-      bottomNavigationBar: Consumer<KerjakanSoalListProvider>(
-          builder: (context, kerjakanSoalListProvider, child) {
-        return Container(
+    return Consumer<KerjakanSoalListProvider>(
+        builder: (context, kerjakanSoalListProvider, child) {
+      print('Ini apa => ${kerjakanSoalListProvider.kerjakanSoalList?.data}');
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title ?? 'Tunggu..'),
+        ),
+        // Tombol selanjutnya atau submit
+        bottomNavigationBar: Container(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -147,171 +152,155 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
               ],
             ),
           ),
-        );
-      }),
-      body: kerjakanSoalListProvider?.kerjakanSoalList == null
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Consumer<KerjakanSoalListProvider>(
-              builder: (context, kerjakanSoalListProvider, child) {
-              return Column(
+        ),
+        body: kerjakanSoalListProvider.kerjakanSoalList == null
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
                 children: [
                   // TabBar UNTUK NOMOR
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    padding:
-                        const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-                    height: 50,
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(100)),
-                    child: TabBar(
-                      onTap: (value) {},
-                      controller: _controller,
-                      isScrollable: true,
-                      indicator: BoxDecoration(
-                          border: Border.all(
-                              color: R.appCOLORS.primaryColor, width: 1),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(100)),
-                      labelColor: R.appCOLORS.primaryColor,
-                      unselectedLabelColor: Colors.black,
-                      tabs: List.generate(
-                        kerjakanSoalListProvider
-                                .kerjakanSoalList?.data?.length ??
-                            0,
-                        (index) => Tab(
-                          text: '${index + 1}',
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildTabNumber(kerjakanSoalListProvider),
 
                   // tabBar VIEW SOAL
-                  Expanded(
-                    child: Container(
-                      child: TabBarView(
-                        controller: _controller,
-                        children: List.generate(
-                          kerjakanSoalListProvider
-                              .kerjakanSoalList!.data!.length,
-                          (index) => SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Nomor soal
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Soal nomor ${index + 1}',
-                                    style: TextStyle(
-                                      color: R.appCOLORS.greySubtitleColor,
-                                    ),
-                                  ),
-                                ),
+                  _buildTabContent(kerjakanSoalListProvider),
+                ],
+              ),
+      );
+    });
+  }
 
-                                // Soal
-                                if (kerjakanSoalListProvider.kerjakanSoalList!
-                                        .data![index].questionTitle !=
-                                    null)
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Html(
-                                      data: kerjakanSoalListProvider
-                                          .kerjakanSoalList!
-                                          .data![index]
-                                          .questionTitle!,
-                                      style: {
-                                        'body': Style(
-                                          padding: EdgeInsets.zero,
-                                          fontSize: const FontSize(12),
-                                        )
-                                      },
-                                    ),
-                                  ),
-                                if (kerjakanSoalListProvider.kerjakanSoalList
-                                        ?.data?[index].questionTitleImg !=
-                                    null)
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Image.network(
-                                        kerjakanSoalListProvider
-                                            .kerjakanSoalList!
-                                            .data![index]
-                                            .questionTitleImg!),
-                                  ),
-
-                                // Opsi jawaban
-                                _buildOptions(
-                                  kerjakanSoalList: kerjakanSoalListProvider
-                                      .kerjakanSoalList!,
-                                  index: index,
-                                  option: 'A',
-                                  answere: kerjakanSoalListProvider
-                                      .kerjakanSoalList!.data![index].optionA,
-                                  answereImg: kerjakanSoalListProvider
-                                      .kerjakanSoalList!
-                                      .data![index]
-                                      .optionAImg,
-                                ),
-                                _buildOptions(
-                                  kerjakanSoalList: kerjakanSoalListProvider
-                                      .kerjakanSoalList!,
-                                  index: index,
-                                  option: 'B',
-                                  answere: kerjakanSoalListProvider
-                                      .kerjakanSoalList!.data![index].optionB,
-                                  answereImg: kerjakanSoalListProvider
-                                      .kerjakanSoalList!
-                                      .data![index]
-                                      .optionBImg,
-                                ),
-                                _buildOptions(
-                                  kerjakanSoalList: kerjakanSoalListProvider
-                                      .kerjakanSoalList!,
-                                  index: index,
-                                  option: 'C',
-                                  answere: kerjakanSoalListProvider
-                                      .kerjakanSoalList!.data![index].optionC,
-                                  answereImg: kerjakanSoalListProvider
-                                      .kerjakanSoalList!
-                                      .data![index]
-                                      .optionCImg,
-                                ),
-                                _buildOptions(
-                                  kerjakanSoalList: kerjakanSoalListProvider
-                                      .kerjakanSoalList!,
-                                  index: index,
-                                  option: 'D',
-                                  answere: kerjakanSoalListProvider
-                                      .kerjakanSoalList!.data![index].optionD,
-                                  answereImg: kerjakanSoalListProvider
-                                      .kerjakanSoalList!
-                                      .data![index]
-                                      .optionDImg,
-                                ),
-                                _buildOptions(
-                                  kerjakanSoalList: kerjakanSoalListProvider
-                                      .kerjakanSoalList!,
-                                  index: index,
-                                  option: 'E',
-                                  answere: kerjakanSoalListProvider
-                                      .kerjakanSoalList!.data![index].optionE,
-                                  answereImg: kerjakanSoalListProvider
-                                      .kerjakanSoalList!
-                                      .data![index]
-                                      .optionEImg,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+  Expanded _buildTabContent(KerjakanSoalListProvider kerjakanSoalListProvider) {
+    return Expanded(
+      child: Container(
+        child: TabBarView(
+          controller: _controller,
+          children: List.generate(
+            kerjakanSoalListProvider.kerjakanSoalList!.data!.length,
+            (index) => SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nomor soal
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Soal nomor ${index + 1}',
+                      style: TextStyle(
+                        color: R.appCOLORS.greySubtitleColor,
                       ),
                     ),
                   ),
+
+                  // Soal
+                  if (kerjakanSoalListProvider
+                          .kerjakanSoalList!.data![index].questionTitle !=
+                      null)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Html(
+                        data: kerjakanSoalListProvider
+                            .kerjakanSoalList!.data![index].questionTitle!,
+                        style: {
+                          'body': Style(
+                            padding: EdgeInsets.zero,
+                            fontSize: const FontSize(12),
+                          )
+                        },
+                      ),
+                    ),
+                  if (kerjakanSoalListProvider
+                          .kerjakanSoalList?.data?[index].questionTitleImg !=
+                      null)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(kerjakanSoalListProvider
+                          .kerjakanSoalList!.data![index].questionTitleImg!),
+                    ),
+
+                  // Opsi jawaban
+                  _buildOptions(
+                    kerjakanSoalList:
+                        kerjakanSoalListProvider.kerjakanSoalList!,
+                    index: index,
+                    option: 'A',
+                    answere: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionA,
+                    answereImg: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionAImg,
+                  ),
+                  _buildOptions(
+                    kerjakanSoalList:
+                        kerjakanSoalListProvider.kerjakanSoalList!,
+                    index: index,
+                    option: 'B',
+                    answere: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionB,
+                    answereImg: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionBImg,
+                  ),
+                  _buildOptions(
+                    kerjakanSoalList:
+                        kerjakanSoalListProvider.kerjakanSoalList!,
+                    index: index,
+                    option: 'C',
+                    answere: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionC,
+                    answereImg: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionCImg,
+                  ),
+                  _buildOptions(
+                    kerjakanSoalList:
+                        kerjakanSoalListProvider.kerjakanSoalList!,
+                    index: index,
+                    option: 'D',
+                    answere: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionD,
+                    answereImg: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionDImg,
+                  ),
+                  _buildOptions(
+                    kerjakanSoalList:
+                        kerjakanSoalListProvider.kerjakanSoalList!,
+                    index: index,
+                    option: 'E',
+                    answere: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionE,
+                    answereImg: kerjakanSoalListProvider
+                        .kerjakanSoalList!.data![index].optionEImg,
+                  ),
                 ],
-              );
-            }),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container _buildTabNumber(KerjakanSoalListProvider kerjakanSoalListProvider) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+      height: 50,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(100)),
+      child: TabBar(
+        onTap: (value) {},
+        controller: _controller,
+        isScrollable: true,
+        indicator: BoxDecoration(
+            border: Border.all(color: R.appCOLORS.primaryColor, width: 1),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(100)),
+        labelColor: R.appCOLORS.primaryColor,
+        unselectedLabelColor: Colors.black,
+        tabs: List.generate(
+          kerjakanSoalListProvider.kerjakanSoalList?.data?.length ?? 0,
+          (index) => Tab(
+            text: '${index + 1}',
+          ),
+        ),
+      ),
     );
   }
 

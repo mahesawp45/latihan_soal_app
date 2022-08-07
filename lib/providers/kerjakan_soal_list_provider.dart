@@ -11,6 +11,13 @@ class KerjakanSoalListProvider with ChangeNotifier {
 
     if (daftarSoalResult.status == Status.success) {
       kerjakanSoalList = KerjakanSoalList.fromJson(daftarSoalResult.data!);
+      notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    kerjakanSoalList;
+    super.dispose();
   }
 }

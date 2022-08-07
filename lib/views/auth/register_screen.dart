@@ -42,13 +42,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   TextEditingController schoolNameController = TextEditingController();
 
-  UserProvider? userProvider;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
+
+  initDataUser() {
+    emailController.text = UserHelpers.getUserEmail() ?? '';
+    fullNameController.text = UserHelpers.getUserDisplayName() ?? '';
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
-    userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider!.getUserDataWhenFirstLogin();
+    initDataUser();
   }
 
   @override
@@ -101,8 +107,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               onTap: () async {
                 final jsonDataUser = {
-                  'email': userProvider.emailController.text,
-                  'nama_lengkap': userProvider.fullNameController.text,
+                  'email': emailController.text,
+                  'nama_lengkap': fullNameController.text,
                   'nama_sekolah': schoolNameController.text,
                   'kelas': selectedKelas,
                   'gender': gender,
@@ -160,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   enabled: false,
                   labelText: 'Email',
                   hintText: 'contoh : hatchibee@email.com',
-                  controller: userProvider.emailController,
+                  controller: emailController,
                   textInputType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                 );
@@ -170,7 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return RegisterTextField(
                   labelText: 'Nama Lengkap',
                   hintText: 'contoh : Hatchi Bee',
-                  controller: userProvider.fullNameController,
+                  controller: fullNameController,
                   textInputAction: TextInputAction.next,
                 );
               }),

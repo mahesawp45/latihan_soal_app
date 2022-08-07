@@ -17,12 +17,24 @@ class PaketSoalScreen extends StatefulWidget {
 class _PaketSoalScreenState extends State<PaketSoalScreen> {
   PaketSoalListProvider? paketSoalListProvider;
 
+  initData() {
+    setState(() {
+      paketSoalListProvider =
+          Provider.of<PaketSoalListProvider>(context, listen: false);
+      paketSoalListProvider!.getPaketSoal(widget.id ?? '');
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    paketSoalListProvider =
-        Provider.of<PaketSoalListProvider>(context, listen: false);
-    paketSoalListProvider!.getPaketSoal(widget.id);
+    initData();
+  }
+
+  @override
+  void dispose() {
+    initData();
+    super.dispose();
   }
 
   @override
@@ -56,16 +68,16 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
             ),
             const SizedBox(height: 10),
             // Kalau pakai Grid, List view yang ada didalam sebuah widget harus di wrap pakai expanded
-            Expanded(
-              child: paketSoalListProvider?.paketSoalList == null
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : SingleChildScrollView(
-                      child: Center(
-                        child: Consumer<PaketSoalListProvider>(
-                            builder: (context, paketSoalListProvider, child) {
-                          return Wrap(
+            Consumer<PaketSoalListProvider>(
+                builder: (context, paketSoalListProvider, child) {
+              return Expanded(
+                child: paketSoalListProvider.paketSoalList == null
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : SingleChildScrollView(
+                        child: Center(
+                          child: Wrap(
                             children: List.generate(
                               paketSoalListProvider
                                       .paketSoalList?.data?.length ??
@@ -92,7 +104,7 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
 
                                     if (data == true) {
                                       paketSoalListProvider
-                                          .getPaketSoal(widget.id);
+                                          .getPaketSoal(widget.id ?? '');
                                     }
                                   },
                                   child: Container(
@@ -107,11 +119,11 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
                                 );
                               },
                             ).toList(),
-                          );
-                        }),
+                          ),
+                        ),
                       ),
-                    ),
-            ),
+              );
+            }),
           ],
         ),
       ),

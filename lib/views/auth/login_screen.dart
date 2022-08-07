@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                            Kalau belum pernah register, nanti datanya disimpan ke local barengan waktu register ke API
                           */
                           await PreferenceHelpers().setUserData(data.data!);
-                          Navigator.pushNamed(
+                          Navigator.pushReplacementNamed(
                               context, R.appRoutesTO.mainScreen);
                         } else {
                           Navigator.pushNamed(

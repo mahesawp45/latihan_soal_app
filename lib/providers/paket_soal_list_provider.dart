@@ -6,12 +6,18 @@ import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
 class PaketSoalListProvider extends ChangeNotifier {
   PaketSoalList? paketSoalList;
 
-  getPaketSoal(id) async {
+  getPaketSoal(String id) async {
     final mapelResult = await LatihanSoalAPI().getPaketSoal(id);
 
     if (mapelResult.status == Status.success) {
       paketSoalList = PaketSoalList.fromJson(mapelResult.data!);
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    paketSoalList;
+    super.dispose();
   }
 }

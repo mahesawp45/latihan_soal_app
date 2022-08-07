@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/providers/banner_provider.dart';
+import 'package:latihan_soal_app/providers/chat_provider.dart';
 import 'package:latihan_soal_app/providers/kerjakan_soal_list_provider.dart';
 import 'package:latihan_soal_app/providers/latihan_soal_skor_provider.dart';
 import 'package:latihan_soal_app/providers/mapel_provider.dart';
@@ -75,6 +76,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => LatihanSoalSkorProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ChatProvider(),
         ),
       ],
       child: MaterialApp(

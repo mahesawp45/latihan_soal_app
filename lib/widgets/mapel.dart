@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/providers/mapel_provider.dart';
 import 'package:latihan_soal_app/widgets/progress_bar.dart';
+import 'package:provider/provider.dart';
 
 /// Sebuah widget card buatan sendiri,
 ///
@@ -19,60 +21,61 @@ class MapelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(totalDone);
-    print(totalPacket);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 20,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(13),
-            decoration: BoxDecoration(
-              color: R.appCOLORS.greyColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            height: 53,
-            width: 53,
-            child: Image.asset(R.appASSETS.atomICON),
+    return Consumer<MapelProvider>(
+      builder: (context, mapelProvider, child) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(width: 9),
-          // Kalau bikin stack di dalam element row harus pakai expanded agar tidak overflow
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$totalDone/$totalPacket Paket latihan soal',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: R.appCOLORS.greyTextColor,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                ProgressBarWidget(
-                    totalDone: totalDone, totalPaket: totalPacket),
-              ],
-            ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 20,
           ),
-        ],
-      ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: R.appCOLORS.greyColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                height: 53,
+                width: 53,
+                child: Image.asset(R.appASSETS.atomICON),
+              ),
+              const SizedBox(width: 9),
+              // Kalau bikin stack di dalam element row harus pakai expanded agar tidak overflow
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '$totalDone/$totalPacket Paket latihan soal',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: R.appCOLORS.greyTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    ProgressBarWidget(
+                        totalDone: totalDone, totalPaket: totalPacket),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

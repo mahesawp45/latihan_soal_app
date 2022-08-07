@@ -213,12 +213,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final currentMapel = mapelList.data![index];
 
-                    print('ini => ${currentMapel.jumlahDone! + 1}');
-
                     return GestureDetector(
                       onTap: () async {
-                        print(currentMapel.courseId);
-
                         final data = await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -298,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Halo ${user?.userName ?? ""}👋',
+                  'Halo, ${user?.userName ?? ""}👋',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,

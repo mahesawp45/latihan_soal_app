@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_app/helpers/preference_helpers.dart';
-import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
 
 enum Gender { lakiLaki, perempuan }
@@ -14,13 +13,6 @@ class UserProvider extends ChangeNotifier {
 
   String? gender;
   String? kelas;
-
-  /// Provider untuk Get data user yang baru login
-  getUserDataWhenFirstLogin() async {
-    emailController.text = UserHelpers.getUserEmail() ?? '';
-    fullNameController.text = UserHelpers.getUserDisplayName() ?? '';
-    notifyListeners();
-  }
 
   /// Provider Get data user yang sudah login
   getUserData() async {
