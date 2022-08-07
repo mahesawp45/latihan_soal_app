@@ -3,6 +3,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_app/constants/r.dart';
+import 'package:latihan_soal_app/providers/banner_provider.dart';
+import 'package:latihan_soal_app/providers/kerjakan_soal_list_provider.dart';
+import 'package:latihan_soal_app/providers/latihan_soal_skor_provider.dart';
+import 'package:latihan_soal_app/providers/mapel_provider.dart';
+import 'package:latihan_soal_app/providers/paket_soal_list_provider.dart';
+import 'package:latihan_soal_app/providers/user_provider.dart';
 import 'package:latihan_soal_app/views/auth/login_screen.dart';
 import 'package:latihan_soal_app/views/main/discussion/chat_screen.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/home_screen.dart';
@@ -14,6 +20,7 @@ import 'package:latihan_soal_app/views/main/profile/profile_screen.dart';
 import 'package:latihan_soal_app/views/main_screen.dart';
 import 'package:latihan_soal_app/views/auth/register_screen.dart';
 import 'package:latihan_soal_app/views/splash_screen.dart';
+import 'package:provider/provider.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -49,41 +56,64 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Latihan Soal',
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(backgroundColor: R.appCOLORS.primaryColor),
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        scaffoldBackgroundColor: R.appCOLORS.greyColor,
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: R.appCOLORS.primaryColor,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => MapelProvider(),
         ),
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-            .copyWith(secondary: R.appCOLORS.primaryColor),
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => BannerProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PaketSoalListProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => KerjakanSoalListProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => LatihanSoalSkorProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Latihan Soal',
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(backgroundColor: R.appCOLORS.primaryColor),
+          textTheme: GoogleFonts.poppinsTextTheme(),
+          scaffoldBackgroundColor: R.appCOLORS.greyColor,
+          floatingActionButtonTheme: FloatingActionButtonThemeData(
+            backgroundColor: R.appCOLORS.primaryColor,
+          ),
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+              .copyWith(secondary: R.appCOLORS.primaryColor),
+        ),
+        initialRoute: R.appRoutesTO.splashScreen,
+        routes: {
+          // Splash, Login, Register
+          R.appRoutesTO.splashScreen: (context) => const SplashScreen(),
+          R.appRoutesTO.loginScreen: (context) => const LoginScreen(),
+          R.appRoutesTO.registerScreen: (context) => const RegisterScreen(),
+
+          // Home
+          R.appRoutesTO.mainScreen: (context) => const MainScreen(),
+          R.appRoutesTO.homeScreen: (context) => const HomeScreen(),
+          R.appRoutesTO.chatScreen: (context) => const ChatScreen(),
+          R.appRoutesTO.profileScreen: (context) => const ProfileScreen(),
+
+          // Latihan soal
+          R.appRoutesTO.mapelScreen: (context) => const MapelScreen(),
+          R.appRoutesTO.paketSoalScreen: (context) => const PaketSoalScreen(),
+          R.appRoutesTO.kerjakanSoalScreen: (context) =>
+              const KerjakanLatihanSoalScreen(),
+
+          // Profile
+          R.appRoutesTO.editProfileScreen: (context) =>
+              const EditProfileScreen(),
+        },
       ),
-      initialRoute: R.appRoutesTO.splashScreen,
-      routes: {
-        // Splash, Login, Register
-        R.appRoutesTO.splashScreen: (context) => const SplashScreen(),
-        R.appRoutesTO.loginScreen: (context) => const LoginScreen(),
-        R.appRoutesTO.registerScreen: (context) => const RegisterScreen(),
-
-        // Home
-        R.appRoutesTO.mainScreen: (context) => const MainScreen(),
-        R.appRoutesTO.homeScreen: (context) => const HomeScreen(),
-        R.appRoutesTO.chatScreen: (context) => const ChatScreen(),
-        R.appRoutesTO.profileScreen: (context) => const ProfileScreen(),
-
-        // Latihan soal
-        R.appRoutesTO.mapelScreen: (context) => const MapelScreen(),
-        R.appRoutesTO.paketSoalScreen: (context) => const PaketSoalScreen(),
-        R.appRoutesTO.kerjakanSoalScreen: (context) =>
-            const KerjakanLatihanSoalScreen(),
-
-        // Profile
-        R.appRoutesTO.editProfileScreen: (context) => const EditProfileScreen(),
-      },
     );
   }
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:latihan_soal_app/constants/r.dart';
-import 'package:latihan_soal_app/models/latihan_soal_skor.dart';
-import 'package:latihan_soal_app/models/network_response/network_responses.dart';
-import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
+import 'package:latihan_soal_app/providers/latihan_soal_skor_provider.dart';
+import 'package:provider/provider.dart';
 
 class ResultScreen extends StatefulWidget {
   final String? id;
@@ -18,21 +17,14 @@ class ResultScreen extends StatefulWidget {
 }
 
 class _ResultScreenState extends State<ResultScreen> {
-  LatihanSoalSkor? latihanSoalSkorData;
-
-  getResultLatihanSoal() async {
-    final result = await LatihanSoalAPI().getScoreResult(widget.id);
-
-    if (result.status == Status.success) {
-      latihanSoalSkorData = LatihanSoalSkor.fromJson(result.data!);
-      setState(() {});
-    }
-  }
+  LatihanSoalSkorProvider? latihanSoalSkorProvider;
 
   @override
   void initState() {
     super.initState();
-    getResultLatihanSoal();
+    latihanSoalSkorProvider =
+        Provider.of<LatihanSoalSkorProvider>(context, listen: false);
+    latihanSoalSkorProvider!.getResultLatihanSoal(widget.id);
   }
 
   @override
@@ -40,7 +32,7 @@ class _ResultScreenState extends State<ResultScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return latihanSoalSkorData == null
+    return latihanSoalSkorProvider?.latihanSoalSkorData == null
         ? Scaffold(
             backgroundColor: R.appCOLORS.primaryColor,
             body: const Center(
@@ -95,13 +87,16 @@ class _ResultScreenState extends State<ResultScreen> {
                         fontSize: 15,
                       ),
                     ),
-                    Text(
-                      '${latihanSoalSkorData!.data!.result?.jumlahScore}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 100,
-                      ),
-                    ),
+                    Consumer<LatihanSoalSkorProvider>(
+                        builder: (context, latihanSoalSkorProvider, child) {
+                      return Text(
+                        '${latihanSoalSkorProvider.latihanSoalSkorData!.data!.result?.jumlahScore}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 100,
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),

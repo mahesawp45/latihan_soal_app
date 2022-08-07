@@ -5,9 +5,11 @@ import 'package:latihan_soal_app/helpers/preference_helpers.dart';
 import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
+import 'package:latihan_soal_app/providers/user_provider.dart';
 import 'package:latihan_soal_app/repository/auth_api.dart';
 import 'package:latihan_soal_app/widgets/gender_field_select.dart';
 import 'package:latihan_soal_app/widgets/login_button.dart';
+import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -16,49 +18,18 @@ class EditProfileScreen extends StatefulWidget {
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-enum Gender { lakiLaki, perempuan }
-
 class _EditProfileScreenState extends State<EditProfileScreen> {
   List<String> allKelasSLTA = ['10', '11', '12'];
   List<String> allGender = ['Laki-laki', 'Perempuan'];
 
-  onTapGender(Gender genderInput) {
-    switch (genderInput) {
-      case Gender.lakiLaki:
-        gender = 'Laki-laki';
-        break;
-      case Gender.perempuan:
-        gender = 'Perempuan';
-        break;
-    }
-    setState(() {});
-  }
-
-  TextEditingController emailController = TextEditingController();
-  TextEditingController fullNameController = TextEditingController();
-  TextEditingController schoolNameController = TextEditingController();
-  String? gender;
-  String? kelas;
   String? selectedKelas;
-
-  UserData? user;
-
-  initDataUser() async {
-    user = await PreferenceHelpers().getUserData();
-
-    if (user != null) {
-      emailController.text = user!.userEmail!;
-      fullNameController.text = user!.userName!;
-      schoolNameController.text = user!.userAsalSekolah!;
-      gender = user!.userGender!;
-      kelas = user!.kelas!;
-      setState(() {});
-    }
-  }
+  UserProvider? userProvider;
 
   @override
   void initState() {
-    initDataUser();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider!.getUserData();
+    userProvider!.initDataUser();
     super.initState();
   }
 
@@ -77,131 +48,139 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 20),
-          child: LoginButton(
-            radius: 8,
-            backgroundColor: R.appCOLORS.primaryColor,
-            borderColor: R.appCOLORS.primaryColor,
-            child: Text(
-              R.appSTRINGS.perbaharuiAkun,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            onTap: () async {
-              final jsonDataUser = {
-                'email': emailController.text,
-                'nama_lengkap': fullNameController.text,
-                'nama_sekolah': schoolNameController.text,
-                'gender': gender,
-                'kelas': selectedKelas ?? kelas,
-                'foto': UserHelpers.getUserPhotoURL(),
-              };
+          child:
+              Consumer<UserProvider>(builder: (context, userProvider, child) {
+            return LoginButton(
+              radius: 8,
+              backgroundColor: R.appCOLORS.primaryColor,
+              borderColor: R.appCOLORS.primaryColor,
+              child: Text(
+                R.appSTRINGS.perbaharuiAkun,
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
+                final jsonDataUser = {
+                  'email': userProvider.emailController.text,
+                  'nama_lengkap': userProvider.fullNameController.text,
+                  'nama_sekolah': userProvider.schoolNameController.text,
+                  'gender': userProvider.gender,
+                  'kelas': selectedKelas ?? userProvider.kelas,
+                  'foto': UserHelpers.getUserPhotoURL(),
+                };
 
-              print(jsonDataUser);
+                print(jsonDataUser);
 
-              // Post data user ke API
-              final result = await AuthAPI().postUpdateUser(jsonDataUser);
+                // Post data user ke API
+                final result = await AuthAPI().postUpdateUser(jsonDataUser);
 
-              if (result.status == Status.success) {
-                // Cek apakah statusnya == 1 sesuai response API?
-                final registerResult = UserByEmail.fromJson(result.data ?? {});
+                if (result.status == Status.success) {
+                  // Cek apakah statusnya == 1 sesuai response API?
+                  final registerResult =
+                      UserByEmail.fromJson(result.data ?? {});
 
-                if (registerResult.status == 1) {
-                  // Simpan ke local data user yang telah register
-                  await PreferenceHelpers().setUserData(registerResult.data!);
+                  if (registerResult.status == 1) {
+                    // Simpan ke local data user yang telah register
+                    await PreferenceHelpers().setUserData(registerResult.data!);
 
-                  // diisi true biar bisa ditangkep data yg berubah disini ke page yg dituju
-                  Navigator.pop(context, true);
+                    // diisi true biar bisa ditangkep data yg berubah disini ke page yg dituju
+                    Navigator.pop(context, true);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          registerResult.message ?? '',
+                        ),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        registerResult.message ?? '',
+                        R.appSTRINGS.pesanErrorRegisText,
                       ),
                     ),
                   );
                 }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      R.appSTRINGS.pesanErrorRegisText,
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
+              },
+            );
+          }),
         ),
       ),
-      body: user == null
+      body: userProvider?.user == null
           ? const Center(
               child: CircularProgressIndicator(),
             )
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Data Diri',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                child: Consumer<UserProvider>(
+                    builder: (context, userProvider, child) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Data Diri',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildEditProfileTextField(
-                      controller: fullNameController,
-                      hintText: 'Nama Lengkap',
-                      labelText: 'Nama Lengkap',
-                    ),
-                    _buildEditProfileTextField(
-                      controller: emailController,
-                      labelText: 'Email',
-                      hintText: 'hatchibee@gmail.com',
-                    ),
-                    Row(
-                      children: [
-                        GenderFieldSelect(
-                          gender: 'Laki-Laki',
-                          onPressed: () {
-                            onTapGender(Gender.lakiLaki);
-                          },
-                          bgColor: gender == 'Laki-laki'
-                              ? R.appCOLORS.primaryColor
-                              : Colors.white,
-                          textColor: gender == 'Laki-laki'
-                              ? Colors.white
-                              : R.appCOLORS.blackLabelTextColor,
-                        ),
-                        GenderFieldSelect(
-                          gender: 'Perempuan',
-                          onPressed: () {
-                            onTapGender(Gender.perempuan);
-                          },
-                          bgColor: gender == 'Perempuan'
-                              ? Colors.pink.shade600
-                              : Colors.white,
-                          textColor: gender == 'Perempuan'
-                              ? Colors.white
-                              : R.appCOLORS.blackLabelTextColor,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    _buildDropDownForm(
-                      labelText: 'Kelas',
-                      data: allKelasSLTA,
-                      value: kelas ?? '',
-                    ),
-                    const SizedBox(height: 20),
-                    _buildEditProfileTextField(
-                      controller: schoolNameController,
-                      labelText: 'Sekolah',
-                    ),
-                  ],
-                ),
+                      const SizedBox(height: 20),
+                      _buildEditProfileTextField(
+                        controller: userProvider.fullNameController,
+                        hintText: 'Nama Lengkap',
+                        labelText: 'Nama Lengkap',
+                      ),
+                      _buildEditProfileTextField(
+                        controller: userProvider.emailController,
+                        labelText: 'Email',
+                        hintText: 'hatchibee@gmail.com',
+                      ),
+                      Row(
+                        children: [
+                          GenderFieldSelect(
+                            gender: 'Laki-Laki',
+                            onPressed: () {
+                              userProvider.onTapGender(Gender.lakiLaki);
+                            },
+                            bgColor: userProvider.gender == 'Laki-laki'
+                                ? R.appCOLORS.primaryColor
+                                : Colors.white,
+                            textColor: userProvider.gender == 'Laki-laki'
+                                ? Colors.white
+                                : R.appCOLORS.blackLabelTextColor,
+                          ),
+                          GenderFieldSelect(
+                            gender: 'Perempuan',
+                            onPressed: () {
+                              userProvider.onTapGender(Gender.perempuan);
+                            },
+                            bgColor: userProvider.gender == 'Perempuan'
+                                ? Colors.pink.shade600
+                                : Colors.white,
+                            textColor: userProvider.gender == 'Perempuan'
+                                ? Colors.white
+                                : R.appCOLORS.blackLabelTextColor,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _buildDropDownForm(
+                        labelText: 'Kelas',
+                        data: allKelasSLTA,
+                        value: userProvider.kelas ?? '',
+                      ),
+                      const SizedBox(height: 20),
+                      _buildEditProfileTextField(
+                        controller: userProvider.schoolNameController,
+                        labelText: 'Sekolah',
+                      ),
+                    ],
+                  );
+                }),
               ),
             ),
     );

@@ -3,9 +3,11 @@ import 'package:latihan_soal_app/constants/r.dart';
 import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/kerjakan_soal_list.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
+import 'package:latihan_soal_app/providers/kerjakan_soal_list_provider.dart';
 import 'package:latihan_soal_app/repository/latihan_soal_api.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:latihan_soal_app/views/main/latihan_soal/result_screen.dart';
+import 'package:provider/provider.dart';
 
 class KerjakanLatihanSoalScreen extends StatefulWidget {
   final String? id;
@@ -20,33 +22,26 @@ class KerjakanLatihanSoalScreen extends StatefulWidget {
 
 class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
     with SingleTickerProviderStateMixin {
-  KerjakanSoalList? kerjakanSoalList;
+  KerjakanSoalListProvider? kerjakanSoalListProvider;
 
-  getDaftarSoalList() async {
-    final daftarSoalResult = await LatihanSoalAPI().postKerjakanSoal(widget.id);
-
-    if (daftarSoalResult.status == Status.success) {
-      kerjakanSoalList = KerjakanSoalList.fromJson(daftarSoalResult.data!);
-
-      // instansiasi tabController wkt pemanggilan API berhasil krn harus dapat data length
-
-      _controller =
-          TabController(length: kerjakanSoalList!.data!.length, vsync: this);
-      //Tambahkan SingleTickerProviderStateMixin
-
-      // setStatenya disini biar tombol selanjutnya ganti jadi kumpulin maksudnya biar ada perubahan layar krn tabbar ini dijalanin
-      _controller!.addListener(() {
-        setState(() {});
-      });
-      setState(() {});
-    }
-  }
-
+  // instansiasi tabController wkt pemanggilan API berhasil krn harus dapat data length
   TabController? _controller;
+
   @override
   void initState() {
     super.initState();
-    getDaftarSoalList();
+    kerjakanSoalListProvider =
+        Provider.of<KerjakanSoalListProvider>(context, listen: false);
+    kerjakanSoalListProvider!.getDaftarSoalList(widget.id);
+    _controller = TabController(
+        length: kerjakanSoalListProvider!.kerjakanSoalList!.data!.length,
+        vsync: this);
+    //Tambahkan SingleTickerProviderStateMixin
+
+    // setStatenya disini biar tombol selanjutnya ganti jadi kumpulin maksudnya biar ada perubahan layar krn tabbar ini dijalanin
+    _controller!.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -56,222 +51,267 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
         title: Text(widget.title ?? 'Tunggu..'),
       ),
       // Tombol selanjutnya atau submit
-      bottomNavigationBar: Container(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              kerjakanSoalList != null
-                  ? ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: R.appCOLORS.primaryColor,
-                        fixedSize: const Size(153, 33),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+      bottomNavigationBar: Consumer<KerjakanSoalListProvider>(
+          builder: (context, kerjakanSoalListProvider, child) {
+        return Container(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                kerjakanSoalListProvider.kerjakanSoalList != null
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: R.appCOLORS.primaryColor,
+                          fixedSize: const Size(153, 33),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                      ),
-                      onPressed: () async {
-                        if (_controller!.index ==
-                            kerjakanSoalList!.data!.length - 1) {
-                          // Masukkan ke variable biar dapet true/false
-                          final result = await showModalBottomSheet(
-                            backgroundColor: Colors.transparent,
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (context) {
-                              // INI HARUS dijadikan Statefull biar pas modif bisa langsung
-                              return const BottomSheetConfirm();
-                            },
-                          );
+                        onPressed: () async {
+                          if (_controller!.index ==
+                              kerjakanSoalListProvider
+                                      .kerjakanSoalList!.data!.length -
+                                  1) {
+                            // Masukkan ke variable biar dapet true/false
+                            final result = await showModalBottomSheet(
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) {
+                                // INI HARUS dijadikan Statefull biar pas modif bisa langsung
+                                return const BottomSheetConfirm();
+                              },
+                            );
 
-                          // Kirim semua jawaban latihan soal ke Backend
-                          if (result == true) {
-                            List<String> answers = [];
-                            List<String> questionId = [];
+                            // Kirim semua jawaban latihan soal ke Backend
+                            if (result == true) {
+                              List<String> answers = [];
+                              List<String> questionId = [];
 
-                            // masukan semua data ke data berbentuk array/list
-                            for (var element in kerjakanSoalList!.data!) {
-                              answers.add(element.studentAnswer!);
-                              questionId.add(element.bankQuestionId!);
+                              // masukan semua data ke data berbentuk array/list
+                              for (var element in kerjakanSoalListProvider
+                                  .kerjakanSoalList!.data!) {
+                                answers.add(element.studentAnswer!);
+                                questionId.add(element.bankQuestionId!);
+                              }
+
+                              final payload = {
+                                'user_email': UserHelpers.getUserEmail(),
+                                'exercise_id': widget.id,
+                                'bank_question_id': questionId,
+                                'student_answer': answers,
+                              };
+
+                              print(payload);
+                              final finalResult = await LatihanSoalAPI()
+                                  .postInputJawaban(payload);
+
+                              if (finalResult.status == Status.success) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return ResultScreen(
+                                        id: widget.id,
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Submit gagal. Silahkan ulangi submit!"),
+                                  ),
+                                );
+                              }
                             }
-
-                            final payload = {
-                              'user_email': UserHelpers.getUserEmail(),
-                              'exercise_id': widget.id,
-                              'bank_question_id': questionId,
-                              'student_answer': answers,
-                            };
-
-                            print(payload);
-                            final finalResult = await LatihanSoalAPI()
-                                .postInputJawaban(payload);
-
-                            if (finalResult.status == Status.success) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ResultScreen(
-                                      id: widget.id,
-                                    );
-                                  },
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      "Submit gagal. Silahkan ulangi submit!"),
-                                ),
-                              );
-                            }
+                          } else {
+                            _controller!.animateTo(_controller!.index + 1);
                           }
-                        } else {
-                          _controller!.animateTo(_controller!.index + 1);
-                        }
-                      },
-                      child: Text(
-                        _controller!.index == kerjakanSoalList!.data!.length - 1
-                            ? 'Kumpulin'
-                            : 'Selanjutnya',
-                        style: const TextStyle(
-                          fontSize: 12,
+                        },
+                        child: Text(
+                          _controller!.index ==
+                                  kerjakanSoalListProvider
+                                          .kerjakanSoalList!.data!.length -
+                                      1
+                              ? 'Kumpulin'
+                              : 'Selanjutnya',
+                          style: const TextStyle(
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    )
-                  : const SizedBox(),
-            ],
+                      )
+                    : const SizedBox(),
+              ],
+            ),
           ),
-        ),
-      ),
-      body: kerjakanSoalList == null
+        );
+      }),
+      body: kerjakanSoalListProvider?.kerjakanSoalList == null
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Column(
-              children: [
-                // TabBar UNTUK NOMOR
-                Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  padding:
-                      const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-                  height: 50,
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(100)),
-                  child: TabBar(
-                    onTap: (value) {},
-                    controller: _controller,
-                    isScrollable: true,
-                    indicator: BoxDecoration(
-                        border: Border.all(
-                            color: R.appCOLORS.primaryColor, width: 1),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(100)),
-                    labelColor: R.appCOLORS.primaryColor,
-                    unselectedLabelColor: Colors.black,
-                    tabs: List.generate(
-                      kerjakanSoalList!.data!.length,
-                      (index) => Tab(
-                        text: '${index + 1}',
+          : Consumer<KerjakanSoalListProvider>(
+              builder: (context, kerjakanSoalListProvider, child) {
+              return Column(
+                children: [
+                  // TabBar UNTUK NOMOR
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    padding:
+                        const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                    height: 50,
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(100)),
+                    child: TabBar(
+                      onTap: (value) {},
+                      controller: _controller,
+                      isScrollable: true,
+                      indicator: BoxDecoration(
+                          border: Border.all(
+                              color: R.appCOLORS.primaryColor, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(100)),
+                      labelColor: R.appCOLORS.primaryColor,
+                      unselectedLabelColor: Colors.black,
+                      tabs: List.generate(
+                        kerjakanSoalListProvider
+                                .kerjakanSoalList?.data?.length ??
+                            0,
+                        (index) => Tab(
+                          text: '${index + 1}',
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                // tabBar VIEW SOAL
-                Expanded(
-                  child: Container(
-                    child: TabBarView(
-                      controller: _controller,
-                      children: List.generate(
-                        kerjakanSoalList!.data!.length,
-                        (index) => SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Nomor soal
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Soal nomor ${index + 1}',
-                                  style: TextStyle(
-                                    color: R.appCOLORS.greySubtitleColor,
-                                  ),
-                                ),
-                              ),
-
-                              // Soal
-                              if (kerjakanSoalList!
-                                      .data![index].questionTitle !=
-                                  null)
+                  // tabBar VIEW SOAL
+                  Expanded(
+                    child: Container(
+                      child: TabBarView(
+                        controller: _controller,
+                        children: List.generate(
+                          kerjakanSoalListProvider
+                              .kerjakanSoalList!.data!.length,
+                          (index) => SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Nomor soal
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Html(
-                                    data: kerjakanSoalList!
-                                        .data![index].questionTitle!,
-                                    style: {
-                                      'body': Style(
-                                        padding: EdgeInsets.zero,
-                                        fontSize: const FontSize(12),
-                                      )
-                                    },
+                                  child: Text(
+                                    'Soal nomor ${index + 1}',
+                                    style: TextStyle(
+                                      color: R.appCOLORS.greySubtitleColor,
+                                    ),
                                   ),
                                 ),
-                              if (kerjakanSoalList
-                                      ?.data?[index].questionTitleImg !=
-                                  null)
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Image.network(kerjakanSoalList!
-                                      .data![index].questionTitleImg!),
-                                ),
 
-                              // Opsi jawaban
-                              _buildOptions(
-                                index: index,
-                                option: 'A',
-                                answere: kerjakanSoalList!.data![index].optionA,
-                                answereImg:
-                                    kerjakanSoalList!.data![index].optionAImg,
-                              ),
-                              _buildOptions(
-                                index: index,
-                                option: 'B',
-                                answere: kerjakanSoalList!.data![index].optionB,
-                                answereImg:
-                                    kerjakanSoalList!.data![index].optionBImg,
-                              ),
-                              _buildOptions(
-                                index: index,
-                                option: 'C',
-                                answere: kerjakanSoalList!.data![index].optionC,
-                                answereImg:
-                                    kerjakanSoalList!.data![index].optionCImg,
-                              ),
-                              _buildOptions(
-                                index: index,
-                                option: 'D',
-                                answere: kerjakanSoalList!.data![index].optionD,
-                                answereImg:
-                                    kerjakanSoalList!.data![index].optionDImg,
-                              ),
-                              _buildOptions(
-                                index: index,
-                                option: 'E',
-                                answere: kerjakanSoalList!.data![index].optionE,
-                                answereImg:
-                                    kerjakanSoalList!.data![index].optionEImg,
-                              ),
-                            ],
+                                // Soal
+                                if (kerjakanSoalListProvider.kerjakanSoalList!
+                                        .data![index].questionTitle !=
+                                    null)
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Html(
+                                      data: kerjakanSoalListProvider
+                                          .kerjakanSoalList!
+                                          .data![index]
+                                          .questionTitle!,
+                                      style: {
+                                        'body': Style(
+                                          padding: EdgeInsets.zero,
+                                          fontSize: const FontSize(12),
+                                        )
+                                      },
+                                    ),
+                                  ),
+                                if (kerjakanSoalListProvider.kerjakanSoalList
+                                        ?.data?[index].questionTitleImg !=
+                                    null)
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.network(
+                                        kerjakanSoalListProvider
+                                            .kerjakanSoalList!
+                                            .data![index]
+                                            .questionTitleImg!),
+                                  ),
+
+                                // Opsi jawaban
+                                _buildOptions(
+                                  kerjakanSoalList: kerjakanSoalListProvider
+                                      .kerjakanSoalList!,
+                                  index: index,
+                                  option: 'A',
+                                  answere: kerjakanSoalListProvider
+                                      .kerjakanSoalList!.data![index].optionA,
+                                  answereImg: kerjakanSoalListProvider
+                                      .kerjakanSoalList!
+                                      .data![index]
+                                      .optionAImg,
+                                ),
+                                _buildOptions(
+                                  kerjakanSoalList: kerjakanSoalListProvider
+                                      .kerjakanSoalList!,
+                                  index: index,
+                                  option: 'B',
+                                  answere: kerjakanSoalListProvider
+                                      .kerjakanSoalList!.data![index].optionB,
+                                  answereImg: kerjakanSoalListProvider
+                                      .kerjakanSoalList!
+                                      .data![index]
+                                      .optionBImg,
+                                ),
+                                _buildOptions(
+                                  kerjakanSoalList: kerjakanSoalListProvider
+                                      .kerjakanSoalList!,
+                                  index: index,
+                                  option: 'C',
+                                  answere: kerjakanSoalListProvider
+                                      .kerjakanSoalList!.data![index].optionC,
+                                  answereImg: kerjakanSoalListProvider
+                                      .kerjakanSoalList!
+                                      .data![index]
+                                      .optionCImg,
+                                ),
+                                _buildOptions(
+                                  kerjakanSoalList: kerjakanSoalListProvider
+                                      .kerjakanSoalList!,
+                                  index: index,
+                                  option: 'D',
+                                  answere: kerjakanSoalListProvider
+                                      .kerjakanSoalList!.data![index].optionD,
+                                  answereImg: kerjakanSoalListProvider
+                                      .kerjakanSoalList!
+                                      .data![index]
+                                      .optionDImg,
+                                ),
+                                _buildOptions(
+                                  kerjakanSoalList: kerjakanSoalListProvider
+                                      .kerjakanSoalList!,
+                                  index: index,
+                                  option: 'E',
+                                  answere: kerjakanSoalListProvider
+                                      .kerjakanSoalList!.data![index].optionE,
+                                  answereImg: kerjakanSoalListProvider
+                                      .kerjakanSoalList!
+                                      .data![index]
+                                      .optionEImg,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            }),
     );
   }
 
@@ -280,9 +320,10 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
     required index,
     String? answere,
     String? answereImg,
+    required KerjakanSoalList kerjakanSoalList,
   }) {
     final answereChecked =
-        kerjakanSoalList!.data![index].studentAnswer == option;
+        kerjakanSoalList.data![index].studentAnswer == option;
 
     return Container(
       margin: const EdgeInsets.all(8.0),
@@ -297,7 +338,7 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
       child: GestureDetector(
         onTap: () {
           setState(() {
-            kerjakanSoalList!.data![index].studentAnswer = option;
+            kerjakanSoalList.data![index].studentAnswer = option;
           });
         },
         child: Row(

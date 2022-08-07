@@ -5,10 +5,12 @@ import 'package:latihan_soal_app/helpers/preference_helpers.dart';
 import 'package:latihan_soal_app/helpers/user_helpers.dart';
 import 'package:latihan_soal_app/models/network_response/network_responses.dart';
 import 'package:latihan_soal_app/models/user_by_email.dart';
+import 'package:latihan_soal_app/providers/user_provider.dart';
 import 'package:latihan_soal_app/repository/auth_api.dart';
 import 'package:latihan_soal_app/widgets/gender_field_select.dart';
 import 'package:latihan_soal_app/widgets/login_button.dart';
 import 'package:latihan_soal_app/widgets/register_text_field.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -38,20 +40,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String? selectedKelas;
 
-  TextEditingController emailController = TextEditingController();
-  TextEditingController fullNameController = TextEditingController();
   TextEditingController schoolNameController = TextEditingController();
 
-  initDataUser() {
-    emailController.text = UserHelpers.getUserEmail() ?? '';
-    fullNameController.text = UserHelpers.getUserDisplayName() ?? '';
-    setState(() {});
-  }
+  UserProvider? userProvider;
 
   @override
   void initState() {
-    initDataUser();
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider!.getUserDataWhenFirstLogin();
   }
 
   @override
@@ -89,63 +86,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: LoginButton(
-            backgroundColor: R.appCOLORS.primaryColor,
-            borderColor: R.appCOLORS.primaryColor,
-            child: Text(
-              R.appSTRINGS.daftarText,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            onTap: () async {
-              final jsonDataUser = {
-                'email': emailController.text,
-                'nama_lengkap': fullNameController.text,
-                'nama_sekolah': schoolNameController.text,
-                'kelas': selectedKelas,
-                'gender': gender,
-                'foto': UserHelpers.getUserPhotoURL(),
-              };
+      bottomNavigationBar:
+          Consumer<UserProvider>(builder: (context, userProvider, child) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: LoginButton(
+              backgroundColor: R.appCOLORS.primaryColor,
+              borderColor: R.appCOLORS.primaryColor,
+              child: Text(
+                R.appSTRINGS.daftarText,
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
+                final jsonDataUser = {
+                  'email': userProvider.emailController.text,
+                  'nama_lengkap': userProvider.fullNameController.text,
+                  'nama_sekolah': schoolNameController.text,
+                  'kelas': selectedKelas,
+                  'gender': gender,
+                  'foto': UserHelpers.getUserPhotoURL(),
+                };
 
-              // Post data user ke API
-              final result = await AuthAPI().postRegister(jsonDataUser);
+                // Post data user ke API
+                final result = await AuthAPI().postRegister(jsonDataUser);
 
-              if (result.status == Status.success) {
-                // Cek apakah statusnya == 1 sesuai response API?
-                final registerResult = UserByEmail.fromJson(result.data ?? {});
+                if (result.status == Status.success) {
+                  // Cek apakah statusnya == 1 sesuai response API?
+                  final registerResult =
+                      UserByEmail.fromJson(result.data ?? {});
 
-                if (registerResult.status == 1) {
-                  // Simpan ke local data user yang telah register
-                  await PreferenceHelpers().setUserData(registerResult.data!);
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    R.appRoutesTO.mainScreen,
-                    (route) => false,
-                  );
+                  if (registerResult.status == 1) {
+                    // Simpan ke local data user yang telah register
+                    await PreferenceHelpers().setUserData(registerResult.data!);
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      R.appRoutesTO.mainScreen,
+                      (route) => false,
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          registerResult.message ?? '',
+                        ),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        registerResult.message ?? '',
+                        R.appSTRINGS.pesanErrorRegisText,
                       ),
                     ),
                   );
                 }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      R.appSTRINGS.pesanErrorRegisText,
-                    ),
-                  ),
-                );
-              }
-            },
+              },
+            ),
           ),
-        ),
-      ),
+        );
+      }),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -153,21 +155,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              RegisterTextField(
-                enabled: false,
-                labelText: 'Email',
-                hintText: 'contoh : hatchibee@email.com',
-                controller: emailController,
-                textInputType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-              ),
+              Consumer<UserProvider>(builder: (context, userProvider, child) {
+                return RegisterTextField(
+                  enabled: false,
+                  labelText: 'Email',
+                  hintText: 'contoh : hatchibee@email.com',
+                  controller: userProvider.emailController,
+                  textInputType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                );
+              }),
               const SizedBox(height: 20),
-              RegisterTextField(
-                labelText: 'Nama Lengkap',
-                hintText: 'contoh : Hatchi Bee',
-                controller: fullNameController,
-                textInputAction: TextInputAction.next,
-              ),
+              Consumer<UserProvider>(builder: (context, userProvider, child) {
+                return RegisterTextField(
+                  labelText: 'Nama Lengkap',
+                  hintText: 'contoh : Hatchi Bee',
+                  controller: userProvider.fullNameController,
+                  textInputAction: TextInputAction.next,
+                );
+              }),
               const SizedBox(height: 20),
               Text(
                 'Jenis Kelamin',
