@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -151,18 +153,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
               ),
-              LoginButton(
-                backgroundColor: R.appCOLORS.buttonTextColor,
-                borderColor: Colors.white,
-                iconButton: R.appASSETS.loginWithAppleIDICON,
-                child: Text(
-                  R.appSTRINGS.loginWithAppleIDText,
-                  style: const TextStyle(
-                    fontSize: 16,
+              if (Platform.isIOS)
+                LoginButton(
+                  backgroundColor: R.appCOLORS.buttonTextColor,
+                  borderColor: Colors.white,
+                  iconButton: R.appASSETS.loginWithAppleIDICON,
+                  child: Text(
+                    R.appSTRINGS.loginWithAppleIDText,
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
+                  onTap: () {},
                 ),
-                onTap: () {},
-              ),
             ],
           ),
         );

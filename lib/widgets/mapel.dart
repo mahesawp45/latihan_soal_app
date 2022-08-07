@@ -19,6 +19,9 @@ class MapelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(totalDone);
+    print(totalPacket);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -63,7 +66,8 @@ class MapelWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 5),
-                const ProgressBarWidget(),
+                ProgressBarWidget(
+                    totalDone: totalDone, totalPaket: totalPacket),
               ],
             ),
           ),

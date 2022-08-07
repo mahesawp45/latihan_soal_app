@@ -94,11 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -193,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.pushNamed(
                     context,
                     R.appRoutesTO.mapelScreen,
-                    arguments: mapelList!.data,
+                    arguments: mapelList?.data,
                   );
                 },
                 child: Text(
@@ -223,19 +218,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final currentMapel = mapelList.data![index];
 
+                    print('ini => ${currentMapel.jumlahDone! + 1}');
+
                     return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        final data = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
                                 PaketSoalScreen(id: currentMapel.courseId),
                           ),
                         );
+
+                        if (data == true) {
+                          getMapel();
+                        }
                       },
                       child: MapelWidget(
-                        totalDone: currentMapel.jumlahDone ?? 0,
-                        totalPacket: currentMapel.jumlahMateri ?? 0,
+                        totalDone: currentMapel.jumlahDone!,
+                        totalPacket: currentMapel.jumlahMateri!,
                         title: currentMapel.courseName ?? '',
                       ),
                     );
@@ -300,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Halo ${user!.userName ?? ""}👋',
+                  'Halo ${user?.userName ?? ""}👋',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,

@@ -50,14 +50,6 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
   }
 
   @override
-  void dispose() {
-    kerjakanSoalList;
-    getDaftarSoalList();
-    _controller!.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

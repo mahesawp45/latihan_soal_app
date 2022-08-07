@@ -37,6 +37,14 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Paket Soal'),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -67,8 +75,8 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
                             paketSoalList?.data?.length ?? 0,
                             (index) {
                               return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
+                                onTap: () async {
+                                  final data = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
@@ -80,6 +88,10 @@ class _PaketSoalScreenState extends State<PaketSoalScreen> {
                                       ),
                                     ),
                                   );
+
+                                  if (data == true) {
+                                    getPaketSoal();
+                                  }
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.all(3),

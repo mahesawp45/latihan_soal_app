@@ -32,6 +32,7 @@ class MapelScreen extends StatelessWidget {
                 itemCount: dataMapelistArgs.length,
                 itemBuilder: (context, index) {
                   final currentMapel = dataMapelistArgs[index];
+                  print('${currentMapel.courseName}ini');
 
                   return GestureDetector(
                     onTap: () {

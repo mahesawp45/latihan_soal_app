@@ -52,8 +52,8 @@ class _ResultScreenState extends State<ResultScreen> {
               elevation: 0,
               leading: IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                  Navigator.pop(context, true);
+                  Navigator.pop(context, true);
                 },
                 icon: const Icon(
                   Icons.close,
