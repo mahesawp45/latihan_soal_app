@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -62,112 +63,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
                     return currentChat == null
                         ? Container(
-                            margin: const EdgeInsets.only(
-                              bottom: 15,
-                              right: 15,
-                              left: 15,
-                            ),
+                            height: 100,
+                            width: 100,
                             color: R.appCOLORS.primaryColor,
-                          )
-                        : Container(
-                            margin: const EdgeInsets.only(
-                                bottom: 15, right: 15, left: 30),
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Column(
-                              crossAxisAlignment: user.uid == currentChat['uid']
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  currentChat['name'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xff5200ff),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: user.uid == currentChat['uid']
-                                        ? R.appCOLORS.primaryColor
-                                        : Colors.pink.withOpacity(0.1),
-                                    borderRadius: user.uid == currentChat['uid']
-                                        ? const BorderRadius.only(
-                                            bottomLeft: Radius.circular(20),
-                                            topLeft: Radius.circular(20),
-                                            topRight: Radius.circular(20),
-                                          )
-                                        : const BorderRadius.only(
-                                            bottomLeft: Radius.circular(20),
-                                            bottomRight: Radius.circular(20),
-                                            topRight: Radius.circular(20),
-                                          ),
-                                  ),
-                                  child: currentChat['type'] == 'file'
-                                      ? Image.network(
-                                          currentChat['file_url'],
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return const Center(
-                                              child: Icon(Icons.warning),
-                                            );
-                                          },
-                                        )
-                                      : Text(
-                                          currentChat['content'] ?? '',
-                                          style: TextStyle(
-                                            color:
-                                                user.uid == currentChat['uid']
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                          ),
-                                        ),
-                                ),
-                                Text(
-                                  currentDate == null
-                                      ? 'mengirim..'
-                                      : currentDate.day ==
-                                                  (DateTime.now().day - 1) &&
-                                              currentDate.month <=
-                                                  DateTime.now().month &&
-                                              currentDate.year <=
-                                                  DateTime.now().year
-                                          ? "Kemarin pada ${currentDate.hour}:${currentDate.minute}" //Kemarin
-                                          : currentDate.hour ==
-                                                  DateTime.now().hour
-                                              ? (DateTime.now().minute -
-                                                          (currentDate)
-                                                              .minute) ==
-                                                      0
-                                                  ? 'sekarang' // saat ini juga
-                                                  : '${DateTime.now().minute - (currentDate).minute}m' // sebelum 1 jam hari ini
-                                              : currentDate.day <=
-                                                          (DateTime.now().day -
-                                                              2) ||
-                                                      currentDate.day !=
-                                                              (DateTime.now()
-                                                                      .day -
-                                                                  2) &&
-                                                          currentDate.month <=
-                                                              (DateTime.now()
-                                                                  .month) &&
-                                                          currentDate.year <=
-                                                              DateTime.now()
-                                                                  .year
-                                                  ? DateFormat(
-                                                          'dd MMM yyy, HH:mm')
-                                                      .format(
-                                                          currentDate) // 2 hari atau lebih sebelum hari ini
-                                                  : "${currentDate.hour}:${currentDate.minute}", // Hari ini
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: R.appCOLORS.greySubtitleColor,
-                                  ),
-                                ),
-                              ],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                          );
+                          )
+                        : _buildChatWidget(currentChat, context, currentDate);
                   },
                 );
               },
@@ -208,6 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         children: [
                           Expanded(
                             child: TextField(
+                              autofocus: false,
                               keyboardType: TextInputType.multiline,
                               controller: textEditingController,
                               cursorColor: R.appCOLORS.primaryColor,
@@ -261,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   'file_url': url,
                                   'content': textEditingController.text,
                                   'sent': FieldValue.serverTimestamp(),
+                                  'is_deleted': false,
                                 };
 
                                 chat.add(chatContent).whenComplete(
@@ -297,17 +202,20 @@ class _ChatScreenState extends State<ChatScreen> {
                           'file_url': null,
                           'content': textEditingController.text,
                           'sent': FieldValue.serverTimestamp(),
+                          'is_deleted': false,
                         };
 
                         // Masukkin data ke Firebase Store
                         // chat.add(chatContent).whenComplete(() {
                         //   getDataFromFirebase(); // Sementara untuk stream datanya bisa bgini
                         // });
-                        chat.add(chatContent).whenComplete(
-                          () {
-                            textEditingController.clear();
-                          },
-                        );
+                        // chat.add(chatContent).whenComplete(
+                        //   () {
+                        //     textEditingController.clear();
+                        //   },
+                        // );
+                        textEditingController.clear();
+                        chat.add(chatContent);
                       },
                       icon: Icon(
                         Icons.send,
@@ -321,6 +229,232 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  GestureDetector _buildChatWidget(QueryDocumentSnapshot<Object?> currentChat,
+      BuildContext context, DateTime? currentDate) {
+    return GestureDetector(
+      // Untuk nampilin salin/hapus pesan
+      onLongPress: () {
+        currentChat['is_deleted']
+            ? null
+            : showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Container(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (currentChat['content'] != '')
+                            ListTile(
+                              title: const Text('Salin'),
+                              onTap: () {
+                                FlutterClipboard.copy(
+                                        currentChat['content'] ?? '')
+                                    .then((value) {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(milliseconds: 800),
+                                      content: Text('Text telah disalin!'),
+                                    ),
+                                  );
+                                });
+                              },
+                            ),
+                          if (user.uid == currentChat['uid'])
+                            ListTile(
+                              title: const Text('Hapus'),
+                              onTap: () {
+                                String id = currentChat.id;
+                                chat.doc(id).update({
+                                  'is_deleted': true,
+                                }).then(
+                                  (value) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        duration: Duration(milliseconds: 800),
+                                        content:
+                                            Text('Pesan berhasil dihapus!'),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+      },
+      child: Container(
+        margin: EdgeInsets.only(
+          top: 5,
+          bottom: 10,
+          right: user.uid == currentChat['uid'] ? 15 : 30,
+          left: user.uid == currentChat['uid'] ? 30 : 15,
+        ),
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Column(
+          crossAxisAlignment: user.uid == currentChat['uid']
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Text(
+              currentChat['name'] ?? '',
+              style: const TextStyle(
+                fontSize: 10,
+                color: Color(0xff5200ff),
+              ),
+            ),
+            _buildBaloonChat(currentChat),
+            _buildChatsTime(currentDate),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container _buildBaloonChat(QueryDocumentSnapshot<Object?> currentChat) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      decoration: currentChat['is_deleted']
+          ? BoxDecoration(
+              color: user.uid == currentChat['uid']
+                  ? R.appCOLORS.primaryColor.withOpacity(0.2)
+                  : Colors.pink.withOpacity(0.1),
+              borderRadius: user.uid == currentChat['uid']
+                  ? const BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    )
+                  : const BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+            )
+          : BoxDecoration(
+              color: user.uid == currentChat['uid']
+                  ? R.appCOLORS.primaryColor
+                  : Colors.pink.withOpacity(0.1),
+              borderRadius: user.uid == currentChat['uid']
+                  ? const BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    )
+                  : const BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+            ),
+      child: currentChat['type'] == 'file' && currentChat['is_deleted'] == false
+          ? _buildImageChat(currentChat)
+          : _buildTextChat(currentChat),
+    );
+  }
+
+  Text _buildChatsTime(DateTime? currentDate) {
+    // BARU BANGET
+    if (currentDate == null) {
+      return Text(
+        'mengirim..',
+        style: TextStyle(
+          fontSize: 10,
+          color: R.appCOLORS.greySubtitleColor,
+        ),
+      );
+
+      // KEMARIN
+    } else if (currentDate.day == (DateTime.now().day - 1) &&
+        currentDate.month <= DateTime.now().month &&
+        currentDate.year <= DateTime.now().year) {
+      return Text(
+        "Kemarin pada ${currentDate.hour}:${currentDate.minute}",
+        style: TextStyle(
+          fontSize: 10,
+          color: R.appCOLORS.greySubtitleColor,
+        ),
+      );
+
+      // SEKARANG
+    } else if (currentDate.hour == DateTime.now().hour &&
+        (DateTime.now().minute - (currentDate).minute) == 0) {
+      return Text(
+        'sekarang',
+        style: TextStyle(
+          fontSize: 10,
+          color: R.appCOLORS.greySubtitleColor,
+        ),
+      );
+
+      // 1 jam sebelum SEKARANG
+    } else if (currentDate.hour == DateTime.now().hour &&
+        currentDate.day == DateTime.now().day) {
+      return Text(
+        '${DateTime.now().minute - (currentDate).minute}m',
+        style: TextStyle(
+          fontSize: 10,
+          color: R.appCOLORS.greySubtitleColor,
+        ),
+      );
+
+      //
+    } else if (currentDate.day < DateTime.now().day &&
+        currentDate.day != DateTime.now().day - 2 &&
+        currentDate.month <= (DateTime.now().month) &&
+        currentDate.year <= DateTime.now().year) {
+      return Text(
+        DateFormat('dd MMM yyy, HH:mm').format(currentDate),
+        style: TextStyle(
+          fontSize: 10,
+          color: R.appCOLORS.greySubtitleColor,
+        ),
+      );
+    } else {
+      return Text(
+        "${currentDate.hour}:${currentDate.minute}",
+        style: TextStyle(
+          fontSize: 10,
+          color: R.appCOLORS.greySubtitleColor,
+        ),
+      );
+    }
+  }
+
+  Image _buildImageChat(QueryDocumentSnapshot<Object?> currentChat) {
+    return Image.network(
+      currentChat['file_url'],
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(
+          child: Icon(Icons.warning),
+        );
+      },
+    );
+  }
+
+  Text _buildTextChat(QueryDocumentSnapshot<Object?> currentChat) {
+    return Text(
+      currentChat['is_deleted']
+          ? "Pesan telah dihapus"
+          : currentChat['content'],
+      style: currentChat['is_deleted']
+          ? TextStyle(
+              color: R.appCOLORS.greySubtitleColor,
+              fontStyle: FontStyle.italic,
+            )
+          : TextStyle(
+              color:
+                  user.uid == currentChat['uid'] ? Colors.white : Colors.black,
+            ),
     );
   }
 }
