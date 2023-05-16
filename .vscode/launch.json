@@ -1,34 +1,34 @@
-{
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "latihan_soal_app web",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "chrome",
-            "args": ["--web-port","5000",]
-        },
-        {
-            "name": "latihan_soal_app",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "debug",
-        },
-        {
-            "name": "latihan_soal_app (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile",
+// {
+//     // Use IntelliSense to learn about possible attributes.
+//     // Hover to view descriptions of existing attributes.
+//     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+//     "version": "0.2.0",
+//     "configurations": [
+//         {
+//             "name": "latihan_soal_app web",
+//             "request": "launch",
+//             "type": "dart",
+//             "deviceId": "chrome",
+//             "args": ["--web-port","5000",]
+//         },
+//         {
+//             "name": "latihan_soal_app",
+//             "request": "launch",
+//             "type": "dart",
+//             "flutterMode": "debug",
+//         },
+//         {
+//             "name": "latihan_soal_app (profile mode)",
+//             "request": "launch",
+//             "type": "dart",
+//             "flutterMode": "profile",
             
-        },
-        {
-            "name": "latihan_soal_app (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
-    ]
-}
+//         },
+//         {
+//             "name": "latihan_soal_app (release mode)",
+//             "request": "launch",
+//             "type": "dart",
+//             "flutterMode": "release"
+//         }
+//     ]
+// }

@@ -141,6 +141,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushNamed(
                               context, R.appRoutesTO.registerScreen);
                         }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("${dataUser.message}"),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(

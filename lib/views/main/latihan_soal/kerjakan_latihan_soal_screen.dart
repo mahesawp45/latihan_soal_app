@@ -67,7 +67,7 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
                 kerjakanSoalListProvider.kerjakanSoalList != null
                     ? ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: R.appCOLORS.primaryColor,
+                          backgroundColor: R.appCOLORS.primaryColor,
                           fixedSize: const Size(153, 33),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -204,7 +204,7 @@ class _KerjakanLatihanSoalScreenState extends State<KerjakanLatihanSoalScreen>
                         style: {
                           'body': Style(
                             padding: EdgeInsets.zero,
-                            fontSize: const FontSize(12),
+                            fontSize: FontSize(12),
                           )
                         },
                       ),
